@@ -15,8 +15,6 @@ return new class extends Migration
 
             $table->unsignedBigInteger('id')->primary();
             $table->string('email_registro');
-            $table->string('username');
-            $table->foreign('username')->references('name')->on('users')->onDelete('cascade')->onUpdate('cascade');
             $table->foreign('id')->references('id')->on('clientes')->onDelete('cascade')->onUpdate('cascade');
             $table->timestamps();
 

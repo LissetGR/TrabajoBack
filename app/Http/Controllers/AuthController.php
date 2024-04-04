@@ -62,7 +62,7 @@ class AuthController extends Controller
                 ],200);
             }
 
-            return back()->with('error', 'Usuario o contraseña equivocada');
+            // return back()->with('error', 'Usuario o contraseña equivocada');
 
     //    }catch(ValidationException $error){
     //         return back()->with('error', $error->getMessage());
@@ -116,6 +116,15 @@ class AuthController extends Controller
         ],200);
     }
 
+
+    public function getUser(Request $request){
+        try {
+            $users = User::all();
+            return response()->json($users);
+        } catch (\Exception $e) {
+            return response()->json(['error' => 'Error al obtener los usuarios'], 500);
+        }
+    }
 
 
 }

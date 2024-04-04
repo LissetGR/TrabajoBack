@@ -24,7 +24,8 @@ class User extends Authenticatable
         'role'
     ];
 
-    protected $primaryKey = 'name';
+    // protected $primaryKey = 'name';
+    // public $incrementing = false;
 
     /**
      * The attributes that should be hidden for serialization.
