@@ -13,14 +13,16 @@ return new class extends Migration
     {
         Schema::create('flujo3s', function (Blueprint $table) {
             $table->bigIncrements('id');
-            $table->boolean('cita_cubano');
+            $table->unsignedBigInteger('id_matrimonio');
+            $table->unsignedBigInteger('id_prepararDocs');
+            $table->date('cita_cubano');
             $table->date('solicitud_visado');
-            $table->boolean('retiro_passport');
+            $table->date('retiro_passport');
             $table->date('ultimo_Email');
 
-            $table->unsignedBigInteger('id_matrimonio');
-            $table->foreign('id_matrimonio')->references('numero')->on('matrimonios')->onDelete('cascade')->onUpdate('cascade');
 
+            $table->foreign('id_matrimonio')->references('numero')->on('matrimonios')->onDelete('cascade')->onUpdate('cascade');
+            $table->foreign('id_prepararDocs')->references('id')->on('preparar__docs31s');
 
             $table->timestamps();
         });

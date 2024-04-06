@@ -14,18 +14,27 @@ return new class extends Migration
         Schema::create('flujo1s', function (Blueprint $table) {
             $table->bigIncrements('id');
 
-            $table->date('primer_Email');
-            $table->date('email_Cubano');
-            $table->boolean('coordinar_Matrim');
-            $table->date('segundo_Email');
-            $table->boolean('procura_minrex');
-            $table->date('retirada_CM');
-            $table->date('tercer_Email');
-            $table->date('cm_minrex');
-            $table->date('cuarto_Email');
-
             $table->unsignedBigInteger('id_matrimonio');
+            $table->unsignedBigInteger('id_llegada_documentos');
+            $table->date('primer_Email');
+            $table->date('email_Cubano')->nullable();
+            $table->date('coordinar_Matrim')->nullable();
+            $table->unsignedBigInteger('id_formalizarMatrimonio');
+            $table->date('segundo_Email')->nullable();
+            $table->date('procura_minrex')->nullable();
+            $table->date('retirada_CM')->nullable();
+            $table->date('tercer_Email')->nullable();
+            $table->date('cm_minrex')->nullable();
+            $table->unsignedBigInteger('id_retiroDocsMinrex');
+            $table->date('cuarto_Email')->nullable();
+            $table->unsignedBigInteger('id_traduccion');
+
+
             $table->foreign('id_matrimonio')->references('numero')->on('matrimonios')->onDelete('cascade')->onUpdate('cascade');
+            $table->foreign('id_llegada_documentos')->references('id')->on('llegada__doc11s');
+            $table->foreign('id_formalizarMatrimonio')->references('id')->on('formalizar__matrim12s');
+            $table->foreign('id_retiroDocsMinrex')->references('id')->on('retirar__doc13s');
+            $table->foreign('id_traduccion')->references('id')->on('traduccion14s');
 
             $table->timestamps();
         });

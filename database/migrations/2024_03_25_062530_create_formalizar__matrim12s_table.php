@@ -11,13 +11,12 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('forma_pagos', function (Blueprint $table) {
+        Schema::create('formalizar__matrim12s', function (Blueprint $table) {
             $table->bigIncrements('id');
-            $table->unsignedBigInteger('id_matrimonio');
-            $table->enum('tipo',['Pagato totale', 'Acconto']);
             $table->date('fecha');
-            // $table->integer('recibo');
-            $table->foreign('id_matrimonio')->references('numero')->on('matrimonios')->onDelete('cascade')->onUpdate('cascade');
+            $table->string('lugar');
+            $table->enum('tipo',['Divizioni dei beni', ' Comunidad dei beni']);
+
             $table->timestamps();
         });
     }
@@ -27,6 +26,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('forma_pagos');
+        Schema::dropIfExists('formalizar__matrim12s');
     }
 };

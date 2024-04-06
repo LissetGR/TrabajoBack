@@ -13,12 +13,10 @@ return new class extends Migration
     {
         Schema::create('llegada__doc11s', function (Blueprint $table) {
             $table->bigIncrements('id');
-            $table->unsignedBigInteger('id_flujo1');
             $table->date('fecha');
             $table->enum('doc1',['Cert. di nascita', 'Procura']);
             $table->enum('doc2',['Stato libero', 'Sentenza di divorzio','Atto di morte']);
 
-            $table->foreign('id_flujo1')->references('id')->on('flujo1s')->onDelete('cascade')->onUpdate('cascade');
             $table->timestamps();
         });
     }

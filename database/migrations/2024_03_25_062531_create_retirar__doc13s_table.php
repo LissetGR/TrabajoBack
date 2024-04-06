@@ -11,13 +11,11 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('formalizar__matrim12s', function (Blueprint $table) {
+        Schema::create('retirar__doc13s', function (Blueprint $table) {
             $table->bigIncrements('id');
-            $table->unsignedBigInteger('id_flujo1');
-            $table->date('fecha');
-            $table->string('lugar');
+            $table->date('fecha_Procura');
+            $table->date('fecha_Matrimonio');
 
-            $table->foreign('id_flujo1')->references('id')->on('flujo1s')->onDelete('cascade')->onUpdate('cascade');
             $table->timestamps();
         });
     }
@@ -27,6 +25,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('formalizar__matrim12s');
+        Schema::dropIfExists('retirar__doc13s');
     }
 };

@@ -8,4 +8,14 @@ use Illuminate\Database\Eloquent\Model;
 class Flujo2 extends Model
 {
     use HasFactory;
+
+    protected $fillable=['id_matrimonio','id_prepararDocs','cita_trans', 'quinto_Email','transc_embajada','fecha_solicVisa'];
+
+    public function matrimonio(){
+        return $this->hasOne(matrimonio::class,'id_matrimonio');
+    }
+
+    public function preparacionDocumentos(){
+        return $this->hasOne(preparar_Doc21::class,'id_prepararDocs');
+    }
 }

@@ -8,4 +8,10 @@ use Illuminate\Database\Eloquent\Model;
 class traduccion14 extends Model
 {
     use HasFactory;
+
+    protected $fillable=['fechaProcura', 'fechaMatrimonio'];
+
+    public function Flujo1(){
+        return $this->belongsTo(Flujo1::class);
+    }
 }

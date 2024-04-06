@@ -17,4 +17,13 @@ class Cliente extends Model
         'telefono',
         'email'
     ];
+
+    public function matrimonio(){
+        return $this->hasOne(Matrimonio::class);
+    }
+
+    public function cliente_italiano(){
+        return $this->belongsTo(ClienteItaliano::class);
+    }
+
 }

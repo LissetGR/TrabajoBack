@@ -11,13 +11,13 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('retirar__doc13s', function (Blueprint $table) {
+        Schema::create('preparar__docs31s', function (Blueprint $table) {
             $table->bigIncrements('id');
-            $table->unsignedBigInteger('id_flujo1');
-            $table->date('fecha_Procura');
-            $table->date('fecha_Matrimonio');
+            $table->date('doc_provItalia31');
+            $table->boolean('declaracion_alojamiento');
+            $table->boolean('reserva_aerea');
+            $table->boolean('certificado_residenciaItaliano');
 
-            $table->foreign('id_flujo1')->references('id')->on('flujo1s')->onDelete('cascade')->onUpdate('cascade');
             $table->timestamps();
         });
     }
@@ -27,6 +27,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('retirar__doc13s');
+        Schema::dropIfExists('preparar__docs31s');
     }
 };

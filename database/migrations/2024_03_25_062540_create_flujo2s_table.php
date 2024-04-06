@@ -13,14 +13,17 @@ return new class extends Migration
     {
         Schema::create('flujo2s', function (Blueprint $table) {
             $table->bigIncrements('id');
-            $table->date('cita_trans');
-            $table->date('quinto_Email');
-            $table->boolean('transc_embajada');
-            $table->date('sexto_Correo');
-            $table->date('fecha_solicVisa');
-
             $table->unsignedBigInteger('id_matrimonio');
+            $table->unsignedBigInteger('id_prepararDocs');
+            $table->date('cita_trans');
+            $table->date('quinto_Email')->nullable();
+            $table->date('transc_embajada')->nullable();
+            $table->date('sexto_Email')->nullable();
+            $table->date('fecha_solicVisa')->nullable();
+
+
             $table->foreign('id_matrimonio')->references('numero')->on('matrimonios')->onDelete('cascade')->onUpdate('cascade');
+            $table->foreign('id_prepararDocs')->references('id')->on('preparar__doc21s');
 
             $table->timestamps();
         });

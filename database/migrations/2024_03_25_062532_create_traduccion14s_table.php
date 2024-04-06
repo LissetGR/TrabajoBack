@@ -13,11 +13,8 @@ return new class extends Migration
     {
         Schema::create('traduccion14s', function (Blueprint $table) {
             $table->bigIncrements('id');
-            $table->unsignedBigInteger('id_flujo1');
             $table->date('fechaProcura');
             $table->date('fechaMatrimonio');
-            
-            $table->foreign('id_flujo1')->references('id')->on('flujo1s')->onDelete('cascade')->onUpdate('cascade');
 
             $table->timestamps();
         });
