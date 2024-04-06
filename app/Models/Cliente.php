@@ -22,8 +22,8 @@ class Cliente extends Model
         return $this->hasOne(Matrimonio::class);
     }
 
-    public function cliente_italiano(){
-        return $this->belongsTo(ClienteItaliano::class);
-    }
+    // public function cliente_italiano(){
+    //     return $this->belongsTo(ClienteItaliano::class);
+    // }
 
 }

@@ -92,7 +92,7 @@ Route::middleware('auth:sanctum')->group( function () {
 
 
     //  formalizar matrimonio
-    Route::get('getformalizar12',[formalizarMatrimonio12Controller::class, 'getFormalizar']);
+    Route::get('getFormalizar12',[formalizarMatrimonio12Controller::class, 'getFormalizar']);
 
 
     // llegada de documentos correspondiente al paso 1 del flujo 1

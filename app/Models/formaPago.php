@@ -12,6 +12,6 @@ class formaPago extends Model
     protected $fillable=['id_matrimonio','tipo', 'fecha'];
 
     public function matrimonio(){
-        return $this->hasOne(matrimonio::class, 'id_matrimonio');
+        return $this->belongsTo(matrimonio::class, 'id_matrimonio');
     }
 }

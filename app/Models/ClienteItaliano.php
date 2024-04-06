@@ -18,7 +18,7 @@ class ClienteItaliano extends Cliente
         return $this->hasOne(Cliente::class, 'id');
     }
 
-    public function matrimonio(){
-        return $this->hasOne(Matrimonio::class);
-    }
+    // public function matrimonio(){
+    //     return $this->belongsTo(Matrimonio::class);
+    // }
 }
