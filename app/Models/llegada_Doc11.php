@@ -11,8 +11,8 @@ class llegada_Doc11 extends Model
 
     protected $fillable=['fecha', 'doc1', 'doc2'];
 
-    // public function Flujo1(){
-    //     return $this->belongsTo(Flujo1::class);
-    // }
+    public function Flujo1(){
+        return $this->hasOne(Flujo1::class,'id_llegada_documentos','id');
+    }
 
 }

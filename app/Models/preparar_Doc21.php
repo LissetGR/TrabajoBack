@@ -11,7 +11,7 @@ class preparar_Doc21 extends Model
 
     protected $fillable=['doc_provItalia21','solicitud_Trans','delegacion','certificado_residencia','doc_idItaliano'];
 
-    // public function Flujo2(){
-    //     return $this->belongsTo(Flujo2::class);
-    // }
+    public function Flujo2(){
+        return $this->hasOne(Flujo2::class,'id_prepararDocs','id');
+    }
 }

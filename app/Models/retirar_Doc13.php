@@ -11,7 +11,7 @@ class retirar_Doc13 extends Model
 
     protected $fillable=['fecha_Procura', 'fecha_Matrimonio'];
 
-    // public function Flujo1(){
-    //     return $this->belongsTo(Flujo1::class);
-    // }
+    public function Flujo1(){
+        return $this->hasOne(Flujo1::class,'id_retiroDocsMinrex','id');
+    }
 }

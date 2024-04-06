@@ -14,8 +14,8 @@ class Flujo3 extends Model
     public function matrimonio(){
         return $this->belongsTo(matrimonio::class,'id_matrimonio');
     }
-    
+
     public function preparacionDocumentos(){
-        return $this->hasOne(preparar_Docs31::class,'id_prepararDocs');
+        return $this->belongsTo(preparar_Docs31::class,'id_prepararDocs','id');
     }
 }

@@ -19,11 +19,11 @@ class Cliente extends Model
     ];
 
     public function matrimonio(){
-        return $this->hasOne(Matrimonio::class);
+        return $this->hasOne(Matrimonio::class, 'username_cubano', 'username');
     }
 
-    // public function cliente_italiano(){
-    //     return $this->belongsTo(ClienteItaliano::class);
-    // }
+    public function cliente_italiano(){
+        return $this->hasOne(ClienteItaliano::class ,'id', 'id');
+    }
 
 }

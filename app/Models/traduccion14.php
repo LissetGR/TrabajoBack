@@ -11,7 +11,7 @@ class traduccion14 extends Model
 
     protected $fillable=['fechaProcura', 'fechaMatrimonio'];
 
-    // public function Flujo1(){
-    //     return $this->belongsTo(Flujo1::class);
-    // }
+    public function Flujo1(){
+        return $this->hasOne(Flujo1::class,'id_traduccion','id');
+    }
 }

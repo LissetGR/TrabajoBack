@@ -15,10 +15,10 @@ class ClienteItaliano extends Cliente
     public $incrementing = false;
 
     public function cliente(){
-        return $this->hasOne(Cliente::class, 'id');
+        return $this->belongsTo(Cliente::class, 'id', 'id');
     }
 
-    // public function matrimonio(){
-    //     return $this->belongsTo(Matrimonio::class);
-    // }
+    public function matrimonio(){
+        return $this->hasOne(Matrimonio::class, 'username_italiano', 'username');
+    }
 }

@@ -11,7 +11,7 @@ class formalizar_Matrim12 extends Model
 
     protected $fillable= ['fecha', 'lugar', 'tipo'];
 
-    // public function Flujo1(){
-    //     return $this->belongsTo(Flujo1::class);
-    // }
+    public function Flujo1(){
+        return $this->hasOne(Flujo1::class,'id_formalizarMatrimonio','id');
+    }
 }

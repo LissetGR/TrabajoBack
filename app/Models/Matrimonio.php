@@ -20,23 +20,23 @@ class Matrimonio extends Model
         return $this->belongsTo(Cliente::class, 'username_cubano');
     }
 
-    // public function forma_pago(){
-    //     return $this->hasOne(formaPago::class);
-    // }
+    public function forma_pago(){
+        return $this->hasOne(formaPago::class,'id_matrimonio','numero');
+    }
 
-    // public function flujo1(){
-    //     return $this->hasOne(flujo1::class);
-    // }
+    public function flujo1(){
+        return $this->hasOne(flujo1::class,'id_matrimonio', 'numero');
+    }
 
-    // public function flujo2(){
-    //     return $this->hasOne(flujo2::class);
-    // }
+    public function flujo2(){
+        return $this->hasOne(flujo2::class,'id_matrimonio','numero');
+    }
 
-    // public function flujo3(){
-    //     return $this->hasOne(flujo3::class);
-    // }
+    public function flujo3(){
+        return $this->hasOne(flujo3::class,'id_matrimonio','numero');
+    }
 
-    // public function observaciones(){
-    //     return $this->hasOne(observaciones::class);
-    // }
+    public function observaciones(){
+        return $this->hasOne(observaciones::class,'id_matrimonio','numero');
+    }
 }

@@ -12,6 +12,6 @@ class observaciones extends Model
     protected $fillable=['descripcion','id_matrimonio'];
 
     public function matrimonio(){
-        return $this->hasOne(matrimonio::class,'id_matrimonio');
+        return $this->belongsTo(matrimonio::class,'id_matrimonio', 'numero');
     }
 }
