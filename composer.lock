@@ -4,8 +4,64 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "3bade639d53b2454b7765396584fbf46",
+    "content-hash": "aec488937e61b7bc47ace3f38445915b",
     "packages": [
+        {
+            "name": "advaith/seamless-admin",
+            "version": "v0.6.2",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/Advaith3600/seamless-admin.git",
+                "reference": "882164d4fdfbd2793ea5e8b046bdd6d94f519294"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/Advaith3600/seamless-admin/zipball/882164d4fdfbd2793ea5e8b046bdd6d94f519294",
+                "reference": "882164d4fdfbd2793ea5e8b046bdd6d94f519294",
+                "shasum": ""
+            },
+            "require": {
+                "laravel/framework": "^6.0|^7.0|^8.0|^9.0|^10.0|^11.0",
+                "php": "^8.0.2"
+            },
+            "require-dev": {
+                "laravel/laravel": "^6.0|^7.0|^8.0|^9.0|^10.0|^11.0",
+                "orchestra/testbench": "^4.18|^5.20|^6.23|^7.0|^8.0|^9.0",
+                "phpunit/phpunit": "^9.5|^10.1"
+            },
+            "type": "library",
+            "extra": {
+                "laravel": {
+                    "providers": [
+                        "Advaith\\SeamlessAdmin\\SeamlessAdminServiceProvider"
+                    ],
+                    "aliases": {
+                        "SeamlessAdmin": "Advaith\\SeamlessAdmin\\SeamlessAdmin"
+                    }
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Advaith\\SeamlessAdmin\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Advaith A J",
+                    "email": "advaitharunjeena@gmail.com"
+                }
+            ],
+            "description": "A seamless django like admin panel setup for Laravel",
+            "support": {
+                "issues": "https://github.com/Advaith3600/seamless-admin/issues",
+                "source": "https://github.com/Advaith3600/seamless-admin/tree/v0.6.2"
+            },
+            "time": "2024-03-07T10:33:47+00:00"
+        },
         {
             "name": "brick/math",
             "version": "0.11.0",

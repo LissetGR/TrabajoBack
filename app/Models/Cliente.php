@@ -26,4 +26,8 @@ class Cliente extends Model
         return $this->hasOne(ClienteItaliano::class ,'id', 'id');
     }
 
+    public function user(){
+        return $this->belongsTo(User::class ,'username', 'name');
+    }
+
 }
