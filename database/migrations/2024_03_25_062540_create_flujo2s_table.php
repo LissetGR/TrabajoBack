@@ -15,7 +15,7 @@ return new class extends Migration
             $table->bigIncrements('id');
             $table->unsignedBigInteger('id_matrimonio');
             $table->unsignedBigInteger('id_prepararDocs');
-            $table->date('cita_trans');
+            $table->date('cita_trans')->nullable();
             $table->date('quinto_Email')->nullable();
             $table->date('transc_embajada')->nullable();
             $table->date('sexto_Email')->nullable();

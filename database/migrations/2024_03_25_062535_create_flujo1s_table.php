@@ -16,18 +16,18 @@ return new class extends Migration
 
             $table->unsignedBigInteger('id_matrimonio');
             $table->unsignedBigInteger('id_llegada_documentos');
-            $table->date('primer_Email');
+            $table->date('primer_Email')->nullable();
             $table->date('email_Cubano')->nullable();
             $table->date('coordinar_Matrim')->nullable();
-            $table->unsignedBigInteger('id_formalizarMatrimonio');
+            $table->unsignedBigInteger('id_formalizarMatrimonio')->nullable();
             $table->date('segundo_Email')->nullable();
             $table->date('procura_minrex')->nullable();
             $table->date('retirada_CM')->nullable();
             $table->date('tercer_Email')->nullable();
             $table->date('cm_minrex')->nullable();
-            $table->unsignedBigInteger('id_retiroDocsMinrex');
+            $table->unsignedBigInteger('id_retiroDocsMinrex')->nullable();
             $table->date('cuarto_Email')->nullable();
-            $table->unsignedBigInteger('id_traduccion');
+            $table->unsignedBigInteger('id_traduccion')->nullable();
 
 
             $table->foreign('id_matrimonio')->references('numero')->on('matrimonios')->onDelete('cascade')->onUpdate('cascade');

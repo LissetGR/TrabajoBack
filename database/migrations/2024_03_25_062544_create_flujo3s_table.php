@@ -15,10 +15,10 @@ return new class extends Migration
             $table->bigIncrements('id');
             $table->unsignedBigInteger('id_matrimonio');
             $table->unsignedBigInteger('id_prepararDocs');
-            $table->date('cita_cubano');
-            $table->date('solicitud_visado');
-            $table->date('retiro_passport');
-            $table->date('ultimo_Email');
+            $table->date('cita_cubano')->nullable();
+            $table->date('solicitud_visado')->nullable();
+            $table->date('retiro_passport')->nullable();
+            $table->date('ultimo_Email')->nullable();
 
 
             $table->foreign('id_matrimonio')->references('numero')->on('matrimonios')->onDelete('cascade')->onUpdate('cascade');
