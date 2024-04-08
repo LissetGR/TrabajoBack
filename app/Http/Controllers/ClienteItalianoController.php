@@ -8,6 +8,7 @@ use App\Models\ClienteItaliano;
 use Illuminate\Http\Request;
 use App\Models\cliente;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\DB;
 
 class ClienteItalianoController extends Controller
 {
@@ -30,21 +31,14 @@ class ClienteItalianoController extends Controller
         }
     }
 
-    // public function destroy(Request $request){
-    //     try{
-    //         $cliente = ClienteItaliano::findOrFail($request->input('id'));
-    //         $cliente->delete();
-    //         $cliente = cliente::findOrFail($request->input('id'));
-    //         $cliente->delete();
-    //         return response()->json(new ClienteItalianoResource($cliente));
-    //     }catch(\Exception $e){
-    //         return response()->json($e->getMessage());
-    //     }
-    // }
 
     public function create(Request $request){
 
         try{
+
+            DB::beginTransaction();
+
+            try {
             $validator= $request->validate([
                 'username'=>'required|string|min:8|max:100|alpha_dash|unique:clientes',
                 'nombre_apellidos'=>'required|string|min:10',
@@ -64,17 +58,26 @@ class ClienteItalianoController extends Controller
 
             $cliente_italiano=ClienteItaliano::create([
                 'id'=>$cliente->id,
-                'email_registro'=>$validator['email_registro']
+                'email_registro'=>$validator['email_registro'],
             ]);
+
+            // $cliente->cliente_italiano()->create([
+            //     'email_registro'=>$validator['email_registro'],
+            // ]);
 
             // $cliente_italiano->save();
 
-            return response()->json(new ClienteItalianoResource($cliente_italiano));
+              DB::commit();
 
+              return response()->json(new ClienteItalianoResource($cliente_italiano));
+
+          } catch (\Exception $e) {
+              DB::rollBack();
+              throw $e;
+          };
         }catch(\Exception $e){
             return response()->json($e->getMessage());
         }
-
     }
 
     public function modificar(Request $request){

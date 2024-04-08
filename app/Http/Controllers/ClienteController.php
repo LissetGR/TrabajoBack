@@ -13,23 +13,13 @@ class ClienteController extends Controller
 {
     public function getCliente()
     {
-        $clientes = Cliente::whereNotExists(function ($query) {
-            $query->select(DB::raw(1))
-                ->from('cliente_italianos')
-                ->whereRaw('cliente_italianos.id = clientes.id');
-        })->get();
-
+        $clientes=Cliente::doesntHave('cliente_italiano')->get();
         return response()->json($clientes);
     }
 
     public function getAllCliente()
     {
-        $clientes = Cliente::whereNotExists(function ($query) {
-            $query->select(DB::raw(1))
-                ->from('cliente_italianos')
-                ->whereRaw('cliente_italianos.id = clientes.id');
-        })->get();
-
+        $clientes = Cliente::doesntHave('cliente_italiano')->get();
         $clienteItaliano = ClienteItaliano::all();
 
         $respuesta = [

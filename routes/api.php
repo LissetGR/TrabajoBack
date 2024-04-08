@@ -6,6 +6,7 @@ use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\ClienteController;
 use App\Http\Controllers\ClienteItalianoController;
+use App\Http\Controllers\cuotasController;
 use App\Http\Controllers\flujo1Controller;
 use App\Http\Controllers\flujo2Controller;
 use App\Http\Controllers\flujo3Controller;
@@ -38,9 +39,6 @@ use App\Models\traduccion14;
 Route::prefix('auth')->group(function () {
     Route::post('login',[AuthController::class, 'login']);
     Route::post('register',[AuthController::class, 'register']);
-    Route::get('getClient',[ClienteController::class, 'getCliente']);
-    Route::get('getAllClient',[ClienteController::class, 'getAllCliente']);
-
 });
 
 Route::middleware('auth:sanctum')->group( function () {
@@ -69,6 +67,9 @@ Route::middleware('auth:sanctum')->group( function () {
     Route::get('getMatrimonio',[MatrimonioController::class, 'getMatrimonio']);
     Route::delete('deleteMatrimonio',[MatrimonioController::class, 'destroy']);
     Route::put('modificarMatrimonio',[MatrimonioController::class, 'modificar']);
+    Route::get('getProcesosPorMes',[MatrimonioController::class, 'getProcesosPorMes']);
+    Route::get('getPagos',[MatrimonioController::class, 'getPagos']);
+    Route::get('getNoPagos',[MatrimonioController::class, 'getNoPagos']);
 
     // formas de pago
     Route::get('getFormaPago',[formasPagosController::class, 'getFormaPago']);
@@ -117,6 +118,10 @@ Route::middleware('auth:sanctum')->group( function () {
     // observaciones
     Route::get('getObservaciones',[observacionesController::class, 'getObservaciones']);
 
+
+    // cuotas
+    Route::get('getCuotasById',[cuotasController::class, 'getCuotas']);
+    Route::post('createCuota',[cuotasController::class, 'create']);
 });
 
 

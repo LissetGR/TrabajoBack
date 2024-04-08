@@ -15,6 +15,7 @@ return new class extends Migration
             $table->bigIncrements('id');
             $table->unsignedBigInteger('id_matrimonio');
             $table->enum('tipo',['Pagato totale', 'Acconto']);
+            $table->integer('monto_pago');
             $table->date('fecha');
             // $table->integer('recibo');
             $table->foreign('id_matrimonio')->references('numero')->on('matrimonios')->onDelete('cascade')->onUpdate('cascade');

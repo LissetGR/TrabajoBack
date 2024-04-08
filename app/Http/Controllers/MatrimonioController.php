@@ -12,6 +12,8 @@ use Illuminate\Validation\Rule;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 
+use function PHPUnit\Framework\isEmpty;
+
 class MatrimonioController extends Controller
 {
     public function getMatrimonio()
@@ -146,4 +148,95 @@ class MatrimonioController extends Controller
             return response()->json($e->getMessage());
         }
     }
+
+
+    public function getProcesosPorMes(Request $request){
+      try{
+            $matrimonios=Matrimonio::query()
+            ->when($request->has('day'), function ($query) use ($request) {
+                return $query->whereDay('fecha_llegada', $request->input('day'));
+            })
+            ->when($request->has('mes'), function ($query) use ($request) {
+                return $query->whereMonth('fecha_llegada', $request->input('mes'));
+            })
+            ->when($request->has('anno'), function ($query) use ($request) {
+                return $query->whereYear('fecha_llegada', $request->input('anno'));
+            })
+            ->get();
+
+            if($matrimonios->isNotEmpty()){
+                return response()->json(MatrimonioResource::collection($matrimonios));
+            }else{
+                return response()->json('No hay registros en esa fecha');
+            }
+
+
+      }catch(\Exception $e){
+        return response()->json($e->getMessage());
+      }
+    }
+
+
+    public function getPagos(Request $request){
+        try{
+
+            $matrimonios = Matrimonio::whereHas('forma_pago', function ($query) {
+                $query->where('tipo', 'Pagato totale');
+            })
+            ->orWhereHas('forma_pago', function ($query) {
+                $query->where('tipo', 'Acconto')
+                ->whereExists(function ($query) {
+                    $query->select(DB::raw(1))
+                          ->from('matrimonios')
+                          ->whereRaw('matrimonios.costo = forma_pagos.monto_pago');
+                    });
+            })
+            ->when($request->has('day'), function ($query) use ($request) {
+                return $query->whereDay('fecha_llegada', $request->input('day'));
+            })
+            ->when($request->has('mes'), function ($query) use ($request) {
+                return $query->whereMonth('fecha_llegada', $request->input('mes'));
+            })
+            ->when($request->has('anno'), function ($query) use ($request) {
+                return $query->whereYear('fecha_llegada', $request->input('anno'));
+            })
+            ->get();
+
+            return response()->json(MatrimonioResource::collection($matrimonios));
+        }catch(\Exception $e){
+            return response()->json($e->getMessage());
+        }
+    }
+
+    public function getNoPagos(Request $request){
+        try{
+
+            $matrimonios = Matrimonio::whereDoesntHave('forma_pago', function ($query) {
+                $query->where('tipo', 'Pagato totale');
+            })
+            ->orWhereHas('forma_pago', function ($query) {
+                $query->where('tipo', 'Acconto')
+                ->whereExists(function ($query) {
+                    $query->select(DB::raw(1))
+                          ->from('matrimonios')
+                          ->whereRaw('matrimonios.costo != forma_pagos.monto_pago');
+                    });
+            })
+            ->when($request->has('day'), function ($query) use ($request) {
+                return $query->whereDay('fecha_llegada', $request->input('day'));
+            })
+            ->when($request->has('mes'), function ($query) use ($request) {
+                return $query->whereMonth('fecha_llegada', $request->input('mes'));
+            })
+            ->when($request->has('anno'), function ($query) use ($request) {
+                return $query->whereYear('fecha_llegada', $request->input('anno'));
+            })
+            ->get();
+
+            return response()->json(MatrimonioResource::collection($matrimonios));
+        }catch(\Exception $e){
+            return response()->json($e->getMessage());
+        }
+    }
+
 }
