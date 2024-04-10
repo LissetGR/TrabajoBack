@@ -11,6 +11,8 @@ class Flujo1 extends Model
 
     protected $fillable=['id_matrimonio','id_llegada_documentos','id_formalizarMatrimonio','id_retiroDocsMinrex','id_traduccion','primer_Email', 'email_Cubano','coordinar_Matrim','segundo_Email','procura_minrex','retirada_CM','tercer_Email','cm_minrex','cuarto_Email'];
 
+    protected $hidden = ['llegadaDocs','matrimonio'];
+
     public function matrimonio(){
         return $this->belongsTo(matrimonio::class,'id_matrimonio', 'numero');
     }

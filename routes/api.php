@@ -79,17 +79,19 @@ Route::middleware('auth:sanctum')->group( function () {
 
     // flujo1(Primer paso)
     Route::get('getFlujo1',[flujo1Controller::class, 'getFlujo1']);
-
+    Route::post('createFlujo1',[flujo1Controller::class, 'create']);
+    Route::delete('deleteFlujo1',[flujo1Controller::class, 'destroy']);
 
 
      // flujo2(segundo paso)
      Route::get('getFlujo2',[flujo2Controller::class, 'getFlujo2']);
+     Route::post('createFlujo2',[flujo2Controller::class, 'create']);
 
 
 
      // flujo3(tercer paso)
      Route::get('getFlujo3',[flujo3Controller::class, 'getFlujo3']);
-
+     Route::post('createFlujo3',[flujo3Controller::class, 'create']);
 
 
     //  formalizar matrimonio

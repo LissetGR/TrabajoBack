@@ -57,7 +57,7 @@ class MatrimonioController extends Controller
             ]);
 
 
-            $username_italiano =  Cliente::join('cliente_italianos', 'clientes.id', '=', 'cliente_italianos.id')
+            $username_italiano =Cliente::has('cliente_italiano')
                 ->where('clientes.username', $validator['username_italiano'])
                 ->first();
 
@@ -72,6 +72,9 @@ class MatrimonioController extends Controller
                 'costo' => $validator['costo'],
                 'fecha_llegada' => $validator['fecha_llegada']
             ]);
+
+            $matrimonio->usuario_italiano()->associate($username_italiano);
+            $matrimonio->usuario_cubano()->associate($username_cubano);
 
 
             return response()->json(new MatrimonioResource($matrimonio));
