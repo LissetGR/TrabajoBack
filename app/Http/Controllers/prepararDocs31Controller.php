@@ -35,4 +35,17 @@ class prepararDocs31Controller extends Controller
             return response()->json($e->getMessage());
         }
     }
+
+
+    public function destroy(Request $request){
+        try{
+           $preparar=preparar_Docs31::findOrFail($request->input('id'));
+           $preparar->delete();
+
+
+           return response()->json($preparar);
+        }catch(\Exception $e){
+            return response()->json($e);
+        }
+    }
 }

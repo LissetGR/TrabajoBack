@@ -42,4 +42,16 @@ class cuotasController extends Controller
             return response()->json($e->getMessage());
         }
     }
+
+
+    public function destroy(Request $request){
+        try{
+           $cuota=cuotas::findOrFail($request->input('id'));
+           $cuota->delete();
+
+           return response()->json($cuota);
+        }catch(\Exception $e){
+            return response()->json($e);
+        }
+    }
 }

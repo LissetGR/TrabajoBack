@@ -54,4 +54,15 @@ class llegadaDocs11Controller extends Controller
     }
 
 
+    public function destroy(Request $request){
+        try{
+           $llegada=llegada_Doc11::findOrFail($request->input('id'));
+           $llegada->delete();
+
+
+           return response()->json($llegada);
+        }catch(\Exception $e){
+            return response()->json($e);
+        }
+    }
 }

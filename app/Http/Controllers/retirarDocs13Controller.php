@@ -36,4 +36,17 @@ class retirarDocs13Controller extends Controller
         }
 
     }
+
+
+    public function destroy(Request $request){
+        try{
+           $retirar=retirar_Doc13::findOrFail($request->input('id'));
+           $retirar->delete();
+
+
+           return response()->json($retirar);
+        }catch(\Exception $e){
+            return response()->json($e);
+        }
+    }
 }

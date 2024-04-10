@@ -31,10 +31,22 @@ class observacionesController extends Controller
            $observaciones=observaciones::create($validator);
 
            $observaciones->matrimonio()->associate($matrimonio);
-           
+
            return response()->json($observaciones);
         }catch(\Exception $e){
             return response()->json($e->getMessage());
+        }
+    }
+
+
+    public function destroy(Request $request){
+        try{
+           $observaciones=observaciones::findOrFail($request->input('id'));
+           $observaciones->delete();
+
+           return response()->json($observaciones);
+        }catch(\Exception $e){
+            return response()->json($e);
         }
     }
 }

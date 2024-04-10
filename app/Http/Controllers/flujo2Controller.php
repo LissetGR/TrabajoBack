@@ -6,7 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Flujo2;
 use App\Models\Matrimonio;
 use Illuminate\Http\Request;
-
+use Illuminate\Support\Facades\DB;
 class flujo2Controller extends Controller
 {
     public function getFlujo2(){
@@ -25,6 +25,8 @@ class flujo2Controller extends Controller
         $prepararDocs = app('App\Http\Controllers\prepararDocs21Controller');
 
         try {
+            DB::beginTransaction();
+            try{
             $validator = $request->validate([
                 'id_matrimonio' => 'required|unique:flujo2s|numeric',
                 'cita_trans' => 'nullable|date|date_format:d/m/Y',
@@ -43,12 +45,31 @@ class flujo2Controller extends Controller
             $data = $validator + ['id_prepararDocs' => $preparar->id];
             $flujo2 = Flujo2::create($data);
 
+            DB::commit();
+
             $matrimonio = Matrimonio::find($request->input('id_matrimonio'));
             $flujo2->preparacionDocumentos()->associate($preparar);
             $flujo2->matrimonio()->associate($matrimonio);
 
             return response()->json($flujo2);
+
         } catch (\Exception $e) {
+            DB::rollBack();
+            throw $e;
+        };
+        } catch (\Exception $e) {
+            return response()->json($e->getMessage());
+        }
+    }
+
+    public function destroy (Request $request){
+        try{
+            $flujo=Flujo2::find($request->input('id'));
+            $flujo->delete();
+            $flujo->preparacionDocumentos()->delete();
+
+            return response()->json($flujo);
+        }catch(\Exception $e){
             return response()->json($e->getMessage());
         }
     }

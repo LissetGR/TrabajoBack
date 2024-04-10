@@ -46,4 +46,14 @@ class formalizarMatrimonio12Controller extends Controller
         }
     }
 
+    public function destroy(Request $request){
+        try{
+           $formalizar=formalizar_Matrim12::findOrFail($request->input('id'));
+           $formalizar->delete();
+
+           return response()->json($formalizar);
+        }catch(\Exception $e){
+            return response()->json($e);
+        }
+    }
 }

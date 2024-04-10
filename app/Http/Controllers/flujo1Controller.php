@@ -59,7 +59,7 @@ class flujo1Controller extends Controller
             $flujo1->matrimonio()->associate($matrimonio);
 
             return response()->json($flujo1);
-            
+
         } catch (\Exception $e) {
             DB::rollBack();
             throw $e;
@@ -74,6 +74,10 @@ class flujo1Controller extends Controller
         try{
             $flujo=Flujo1::find($request->input('id'));
             $flujo->delete();
+            $flujo->llegadaDocs()->delete();
+            $flujo->formalizarMatrimonio()->delete();
+            $flujo->retiroDocs()->delete();
+            $flujo->traduccion()->delete();
 
             return response()->json($flujo);
         }catch(\Exception $e){

@@ -44,4 +44,17 @@ class formasPagosController extends Controller
             return response()->json($e->getMessage());
         }
     }
+
+    public function destroy(Request $request){
+        try{
+           $forma=formaPago::findOrFail($request->input('id'));
+           $forma->delete();
+           $forma->cuotas()->delete();
+
+
+           return response()->json($forma);
+        }catch(\Exception $e){
+            return response()->json($e);
+        }
+    }
 }

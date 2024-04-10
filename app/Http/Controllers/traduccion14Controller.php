@@ -19,7 +19,7 @@ class traduccion14Controller extends Controller
     }
 
     public function create(Request $request){
-        
+
         try{
              $validator=$request->validate([
                  'fecha_Procura'=>'required|date|date_format:d/m/Y',
@@ -37,4 +37,16 @@ class traduccion14Controller extends Controller
          }
 
      }
+
+     public function destroy(Request $request){
+        try{
+           $traduccion=traduccion14::findOrFail($request->input('id'));
+           $traduccion->delete();
+
+
+           return response()->json($traduccion);
+        }catch(\Exception $e){
+            return response()->json($e);
+        }
+    }
 }
