@@ -33,7 +33,7 @@ class flujo1Controller extends Controller
             $validator = $request->validate([
                 'id_matrimonio' => 'required|unique:flujo1s|numeric',
                 'primer_Email' => 'nullable|date|date_format:d/m/Y',
-                'email_Cubano' => 'nullable|date|date_format:d/m/Y',
+                'email_Cubano' => 'required_with:primer_Email|date|date_format:d/m/Y',
                 'coordinar_Matrim' => 'nullable|date|date_format:d/m/Y',
                 'segundo_Email' => 'nullable|date|date_format:d/m/Y',
                 'procura_minrex' => 'nullable|date|date_format:d/m/Y',
