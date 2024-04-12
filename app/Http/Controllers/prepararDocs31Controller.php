@@ -36,6 +36,27 @@ class prepararDocs31Controller extends Controller
         }
     }
 
+    public function modificar(Request $request){
+        try{
+            $validator= $request->validate([
+                'doc_provItalia31'=>'required|date|date_format:d/m/Y',
+                'declaracion_alojamiento'=>'required|boolean',
+                'reserva_aerea'=>'required|boolean',
+                'certificado_residenciaItaliano'=>'required|boolean',
+            ]);
+
+            $preparar=preparar_Docs31::findOrFail($request->input('id'));
+            $preparar->update($validator);
+
+            return response()->json($preparar);
+
+        }catch(\Exception $e){
+            return response()->json($e->getMessage());
+        }
+    }
+
+
+
 
     public function destroy(Request $request){
         try{

@@ -18,6 +18,17 @@ class cuotasController extends Controller
         }
     }
 
+    public function getAllCuotas(Request $request){
+        try{
+            $cuotas= cuotas::all();
+            return response()->json($cuotas);
+        }catch(\Exception $e){
+            return response()->json($e->getMessage());
+        }
+    }
+
+
+
     public function create(Request $request){
         try{
             $validator=$request->validate([
@@ -43,6 +54,33 @@ class cuotasController extends Controller
         }
     }
 
+
+    public function modificar(Request $request){
+        try{
+            $validator=$request->validate([
+               'id_formaPago'=>'required|numeric',
+               'cantidad'=>'required|numeric',
+               'fecha'=>'required|date'
+            ]);
+
+            $cuota= cuotas::findOrFail($request->input('id'));
+            $cantidadA=$cuota->cantidad;
+
+            $cuota->update($validator);
+
+            if($request->filled('cantidad')){
+                $cuota->forma_pago->update([
+                    'monto_pago'=> ($cuota->forma_pago->monto_pago-$cantidadA)+$request->input('cantidad'),
+                 ]);
+            }
+
+
+            return response()->json($cuota);
+
+        }catch(\Exception $e){
+            return response()->json($e->getMessage());
+        }
+    }
 
     public function destroy(Request $request){
         try{

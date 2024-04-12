@@ -37,6 +37,24 @@ class retirarDocs13Controller extends Controller
 
     }
 
+    public function modificar(Request $request){
+        try{
+             $validator=$request->validate([
+                 'fecha_Procura'=>'required|date|date_format:d/m/Y',
+                 'fecha_Matrimonio'=>'required|date|date_format:d/m/Y'
+             ]);
+
+             $retiro=retirar_Doc13::findOrFail($request->input('id'));
+
+             $retiro->update($validator);
+
+             return response()->json($retiro);
+         }catch(\Exception $e){
+             return response()->json($e->getMessage());
+         }
+
+     }
+
 
     public function destroy(Request $request){
         try{

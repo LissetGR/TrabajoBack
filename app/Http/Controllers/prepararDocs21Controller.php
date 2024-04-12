@@ -37,6 +37,28 @@ class prepararDocs21Controller extends Controller
         }
     }
 
+    public function modificar(Request $request){
+        try{
+            $validator= $request->validate([
+                'doc_provItalia21'=>'required|date|date_format:d/m/Y',
+                'solicitud_Trans'=>'required|boolean',
+                'delegacion'=>'required|boolean',
+                'certificado_residencia'=>'required|boolean',
+                'doc_idItaliano'=>'required|boolean',
+            ]);
+
+
+            $preparar=preparar_Doc21::findOrFail($request->input('id'));
+            
+            $preparar->update($validator);
+
+            return response()->json($preparar);
+
+        }catch(\Exception $e){
+            return response()->json($e->getMessage());
+        }
+    }
+
 
     public function destroy(Request $request){
         try{

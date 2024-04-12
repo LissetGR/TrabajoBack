@@ -26,7 +26,7 @@ class formalizarMatrimonio12Controller extends Controller
                 'lugar'=>'required|string|',
                 'tipo'=>'required','string',
                 function ($attribute, $value, $fail) {
-                    $allowedValues = ['Divizioni dei beni', ' Comunidad dei beni'];
+                    $allowedValues = ['Divizioni dei beni', 'Comunidad dei beni'];
                     if (!in_array(strtolower($value), array_map('strtolower', $allowedValues))) {
                         $fail($attribute . ' Campo no valido');
                     }
@@ -45,6 +45,34 @@ class formalizarMatrimonio12Controller extends Controller
             return response()->json($e->getMessage());
         }
     }
+
+    public function modificar(Request $request){
+
+        try{
+
+            $validator= $request->validate([
+                'fecha'=>'required|date|date_format:d/m/Y',
+                'lugar'=>'required|string|',
+                'tipo'=>'required','string',
+                function ($attribute, $value, $fail) {
+                    $allowedValues = ['Divizioni dei beni', ' Comunidad dei beni'];
+                    if (!in_array(strtolower($value), array_map('strtolower', $allowedValues))) {
+                        $fail($attribute . ' Campo no valido');
+                    }
+                },
+            ]);
+
+            $formalizar=formalizar_Matrim12::findOrFail($request->input('id'));
+
+            $formalizar->update($validator);
+
+            return response()->json($formalizar);
+
+        }catch(\Exception $e){
+            return response()->json($e->getMessage());
+        }
+    }
+
 
     public function destroy(Request $request){
         try{

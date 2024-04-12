@@ -15,7 +15,7 @@ return new class extends Migration
             $table->bigIncrements('id');
             $table->date('fecha');
             $table->string('lugar');
-            $table->enum('tipo',['Divizioni dei beni', ' Comunidad dei beni']);
+            $table->enum('tipo',['Divizioni dei beni', 'Comunidad dei beni']);
 
             $table->timestamps();
         });

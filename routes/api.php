@@ -73,19 +73,23 @@ Route::middleware('auth:sanctum')->group( function () {
 
     // formas de pago
     Route::get('getFormaPago',[formasPagosController::class, 'getFormaPago']);
-
+    Route::post('createFormaPago',[formasPagosController::class, 'create']);
+    Route::put('modificarFormaPago',[formasPagosController::class, 'modificar']);
+    Route::delete('deleteFormaPago',[formasPagosController::class, 'destroy']);
 
 
 
     // flujo1(Primer paso)
     Route::get('getFlujo1',[flujo1Controller::class, 'getFlujo1']);
     Route::post('createFlujo1',[flujo1Controller::class, 'create']);
+    Route::put('modificarFlujo1',[flujo1Controller::class, 'modificar']);
     Route::delete('deleteFlujo1',[flujo1Controller::class, 'destroy']);
 
 
      // flujo2(segundo paso)
      Route::get('getFlujo2',[flujo2Controller::class, 'getFlujo2']);
      Route::post('createFlujo2',[flujo2Controller::class, 'create']);
+     Route::put('modificarFlujo2',[flujo2Controller::class, 'modificar']);
      Route::delete('deleteFlujo2',[flujo2Controller::class, 'destroy']);
 
 
@@ -93,52 +97,62 @@ Route::middleware('auth:sanctum')->group( function () {
      // flujo3(tercer paso)
      Route::get('getFlujo3',[flujo3Controller::class, 'getFlujo3']);
      Route::post('createFlujo3',[flujo3Controller::class, 'create']);
+     Route::put('modificarFlujo3',[flujo3Controller::class, 'modificar']);
      Route::delete('deleteFlujo3',[flujo3Controller::class, 'destroy']);
 
 
     //  formalizar matrimonio
     Route::get('getFormalizar12',[formalizarMatrimonio12Controller::class, 'getFormalizar']);
     Route::post('createFormalizar12',[formalizarMatrimonio12Controller::class, 'create']);
+    Route::put('modificarFormalizar12',[formalizarMatrimonio12Controller::class, 'modificar']);
     Route::delete('deleteFormalizar12',[formalizarMatrimonio12Controller::class, 'destroy']);
 
     // llegada de documentos correspondiente al paso 1 del flujo 1
     Route::get('getllegadaDeDocs11',[llegadaDocs11Controller::class, 'getllegadaDoc']);
     Route::post('createllegadaDeDocs11',[llegadaDocs11Controller::class, 'create']);
+    Route::put('modificarllegadaDeDocs11',[llegadaDocs11Controller::class, 'modificar']);
     Route::delete('deletellegadaDeDocs11',[llegadaDocs11Controller::class, 'destroy']);
 
     // preparar documentos correspondiente al paso 1 del flujo 2
     Route::get('getPrepararDoc21',[prepararDocs21Controller::class, 'getPreparar']);
     Route::post('createPrepararDoc21',[prepararDocs21Controller::class, 'create']);
+    Route::put('modificarPrepararDoc21',[prepararDocs21Controller::class, 'modificar']);
     Route::delete('deletePrepararDoc21',[prepararDocs21Controller::class, 'destroy']);
 
 
     // preparar documentos correspondiente al paso 1 del flujo 3
     Route::get('getPrepararDoc31',[prepararDocs31Controller::class, 'getPreparar']);
     Route::post('createPrepararDoc31',[prepararDocs31Controller::class, 'create']);
+    Route::put('modificarPrepararDoc31',[prepararDocs31Controller::class, 'modificar']);
     Route::delete('deletePrepararDoc31',[prepararDocs31Controller::class, 'destroy']);
 
 
     //retirar documentos correspondiente al paso 3 del flujo 1
     Route::get('getRetirar13',[retirarDocs13Controller::class, 'getRetirar']);
     Route::post('createRetirar13',[retirarDocs13Controller::class, 'create']);
+    Route::put('modificarRetirar13',[retirarDocs13Controller::class, 'modificar']);
     Route::delete('deleteRetirar13',[retirarDocs13Controller::class, 'destroy']);
 
 
     // traduccion del paso 4 del flujo 1
     Route::get('getTraduccion',[traduccion14Controller::class, 'getTraduccion']);
     Route::post('createTraduccion',[traduccion14Controller::class, 'create']);
+    Route::put('modificarTraduccion',[traduccion14Controller::class, 'modificar']);
     Route::delete('deleteTraduccion',[traduccion14Controller::class, 'destroy']);
 
 
     // observaciones
     Route::get('getObservaciones',[observacionesController::class, 'getObservaciones']);
     Route::post('createObservaciones',[observacionesController::class, 'create']);
+    Route::put('modificarObservaciones',[observacionesController::class, 'modificar']);
     Route::delete('deleteObservaciones',[observacionesController::class, 'destroy']);
 
 
     // cuotas
     Route::get('getCuotasById',[cuotasController::class, 'getCuotas']);
+    Route::get('getCuotas',[cuotasController::class, 'getAllCuotas']);
     Route::post('createCuota',[cuotasController::class, 'create']);
+    Route::put('modificarCuota',[cuotasController::class, 'modificar']);
     Route::delete('deleteCuota',[cuotasController::class, 'destroy']);
 });
 

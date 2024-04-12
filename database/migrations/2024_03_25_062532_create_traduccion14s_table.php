@@ -13,8 +13,8 @@ return new class extends Migration
     {
         Schema::create('traduccion14s', function (Blueprint $table) {
             $table->bigIncrements('id');
-            $table->date('fechaProcura');
-            $table->date('fechaMatrimonio');
+            $table->date('fecha_Procura');
+            $table->date('fecha_Matrimonio');
 
             $table->timestamps();
         });

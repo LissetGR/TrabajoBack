@@ -38,6 +38,25 @@ class observacionesController extends Controller
         }
     }
 
+    public function modificar(Request $request){
+        try{
+           $validator=$request->validate([
+            'id_matrimonio'=>'required|numeric',
+            'descripcion'=>'required|string'
+           ]);
+
+           $matrimonio=Matrimonio::find($request->input('id_matrimonio'));
+
+           $observaciones=observaciones::findOrFail($request->input('id'));
+           $observaciones->update($validator);
+
+           $observaciones->matrimonio()->associate($matrimonio);
+
+           return response()->json($observaciones);
+        }catch(\Exception $e){
+            return response()->json($e->getMessage());
+        }
+    }
 
     public function destroy(Request $request){
         try{

@@ -40,7 +40,6 @@ class flujo2Controller extends Controller
             $preparar = json_encode($preparar->getData());
             $preparar = json_decode(($preparar));
 
-            // if($request->has(''))
 
             $data = $validator + ['id_prepararDocs' => $preparar->id];
             $flujo2 = Flujo2::create($data);
@@ -49,6 +48,51 @@ class flujo2Controller extends Controller
 
             $matrimonio = Matrimonio::find($request->input('id_matrimonio'));
             $flujo2->preparacionDocumentos()->associate($preparar);
+            $flujo2->matrimonio()->associate($matrimonio);
+
+            return response()->json($flujo2);
+
+        } catch (\Exception $e) {
+            DB::rollBack();
+            throw $e;
+        };
+        } catch (\Exception $e) {
+            return response()->json($e->getMessage());
+        }
+    }
+
+    public function modificar(Request $request)
+    {
+
+        $prepararDocs = app('App\Http\Controllers\prepararDocs21Controller');
+
+        try {
+            DB::beginTransaction();
+            try{
+            $validator = $request->validate([
+                'id_matrimonio' => 'required|numeric',
+                'cita_trans' => 'nullable|date|date_format:d/m/Y',
+                'quinto_Email' => 'nullable|date|date_format:d/m/Y',
+                'transc_embajada' => 'nullable|date|date_format:d/m/Y',
+                'sexto_Email' => 'nullable|date|date_format:d/m/Y',
+                'fecha_solicVisa' => 'nullable|date|date_format:d/m/Y',
+            ]);
+
+            $flujo2 = Flujo2::findOrFail($request->input('id_flujo'));
+
+            if($request->anyFilled(['doc_provItalia21','solicitud_Trans','delegacion','certificado_residencia', 'fecha_solicVisa'])){
+                $preparar = $prepararDocs->modificar($request);
+                $preparar = json_encode($preparar->getData());
+                $preparar = json_decode(($preparar));
+                $data = $validator + ['id_prepararDocs' => $preparar->id];
+                $flujo2->update($data);
+                $flujo2->preparacionDocumentos()->associate($preparar);
+            }else{
+                $flujo2->update($validator);
+            }
+
+            DB::commit();
+            $matrimonio = Matrimonio::find($request->input('id_matrimonio'));
             $flujo2->matrimonio()->associate($matrimonio);
 
             return response()->json($flujo2);
