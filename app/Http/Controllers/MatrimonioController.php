@@ -6,6 +6,9 @@ use App\Http\Controllers\Controller;
 use App\Http\Resources\MatrimonioResource;
 use App\Models\Cliente;
 use App\Models\ClienteItaliano;
+use App\Models\Flujo1;
+use App\Models\Flujo2;
+use App\Models\Flujo3;
 use App\Models\Matrimonio;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
@@ -242,4 +245,32 @@ class MatrimonioController extends Controller
         }
     }
 
+
+    public function getAllFlujos(Request $request){
+      try{
+        $flujo1= Flujo1::where('id_matrimonio',$request->input('id'))->first();
+        $flujo2= Flujo2::where('id_matrimonio',$request->input('id'))->first();
+        $flujo3= Flujo3::where('id_matrimonio',$request->input('id'))->first();
+
+        if (isset($flujo1)) {
+            $respuesta = [
+                'flujo1'=>$flujo1,
+            ];
+        }
+        if (isset($flujo2)) {
+           $respuesta=$respuesta+[
+             "flujo2"=>$flujo2,
+           ];
+        }
+        if (isset($flujo3)) {
+            $respuesta=$respuesta+[
+             "flujo3"=>$flujo3,
+            ];
+        }
+        return response()->json($respuesta);
+      }catch(\Exception $e){
+        return response()->json($e->getMessage());
+      }
+
+    }
 }
