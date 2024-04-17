@@ -8,10 +8,10 @@ use Illuminate\Http\Request;
 
 class retirarDocs13Controller extends Controller
 {
-    public function getRetirar()
+    public function getRetirar(Request $request)
     {
         try {
-            $retirar = retirar_Doc13::all();
+            $retirar = retirar_Doc13::find($request->input('id'));
             return response()->json($retirar);
         } catch (\Exception $e) {
             return response()->json($e->getMessage());

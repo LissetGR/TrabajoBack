@@ -28,6 +28,7 @@ return new class extends Migration
             $table->unsignedBigInteger('id_retiroDocsMinrex')->nullable();
             $table->date('cuarto_Email')->nullable();
             $table->unsignedBigInteger('id_traduccion')->nullable();
+            $table->string('observaciones')->nullable();
 
 
             $table->foreign('id_matrimonio')->references('numero')->on('matrimonios')->onDelete('cascade')->onUpdate('cascade');

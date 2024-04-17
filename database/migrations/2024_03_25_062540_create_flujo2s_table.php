@@ -20,6 +20,7 @@ return new class extends Migration
             $table->date('transc_embajada')->nullable();
             $table->date('sexto_Email')->nullable();
             $table->date('fecha_solicVisa')->nullable();
+            $table->string('observaciones')->nullable();
 
 
             $table->foreign('id_matrimonio')->references('numero')->on('matrimonios')->onDelete('cascade')->onUpdate('cascade');

@@ -19,12 +19,53 @@ use function PHPUnit\Framework\isEmpty;
 
 class MatrimonioController extends Controller
 {
-    public function getMatrimonio()
+    public function getMatrimonio(Request $request)
     {
         try {
-            $matrimonio = matrimonio::all();
-            return response()->json(MatrimonioResource::collection($matrimonio));
+            $matrimonio = matrimonio::with(['flujo1.llegadaDocs','flujo1.formalizarMatrimonio','flujo1.retiroDocs','flujo1.traduccion', 'flujo2.preparacionDocumentos', 'flujo3.preparacionDocumentos'])->find($request->input('id'));
+            return response()->json(new MatrimonioResource($matrimonio));
         } catch (\Exception $e) {
+            return response()->json($e->getMessage());
+        }
+    }
+
+    public function busquedaMatrimonio(Request $request){
+        try{
+
+            $matrimonios=Matrimonio::query()
+            ->when($request->has('nombre'), function ($query) use ($request) {
+                  $query->whereHas('usuario_italiano', function ($query) use ($request){
+                    $query->where(DB::raw('lower(nombre_apellidos)'), 'LIKE', '%' . strtolower($request->input('nombre')) . '%');
+                })
+                ->orWhereHas('usuario_cubano', function ($query) use ($request){
+                    $query->where(DB::raw('lower(nombre_apellidos)'), 'LIKE', '%' . strtolower($request->input('nombre')) . '%');
+                });
+            })
+            ->when($request->has('numero'), function ($query) use ($request) {
+                return $query->where('numero', $request->input('numero'));
+            })
+            ->when($request->has('tipo'), function ($query) use ($request) {
+                return $query->where(DB::raw('lower(tipo)'), 'LIKE', '%' . strtolower($request->input('tipo')) . '%');
+            })
+            ->when($request->has('day'), function ($query) use ($request) {
+                return $query->whereDay('fecha_llegada', $request->input('day'));
+            })
+            ->when($request->has('mes'), function ($query) use ($request) {
+                return $query->whereMonth('fecha_llegada', $request->input('mes'));
+            })
+            ->when($request->has('anno'), function ($query) use ($request) {
+                return $query->whereYear('fecha_llegada', $request->input('anno'));
+            })
+            ->with(['flujo1.llegadaDocs','flujo1.formalizarMatrimonio','flujo1.retiroDocs','flujo1.traduccion', 'flujo2.preparacionDocumentos', 'flujo3.preparacionDocumentos'])
+            ->get();
+
+            if($matrimonios->isNotEmpty()){
+                return response()->json(MatrimonioResource::collection($matrimonios));
+            }else{
+                return response()->json('No hay registros con esos datos');
+            }
+
+        }catch(\Exception $e){
             return response()->json($e->getMessage());
         }
     }
@@ -125,10 +166,10 @@ class MatrimonioController extends Controller
             try {
                 $matrimonio = Matrimonio::find($validator['numero']);
                 $matrimonio->update([
-                    'tipo' => $validator['tipo'],
+                    'tipo' => Str::ucfirst($validator['tipo']),
                     'username_cubano' => $username_cubano->id,
                     'username_italiano' => $username_italiano->id,
-                    'via_llegada' => $validator['via_llegada'],
+                    'via_llegada' => Str::ucfirst($validator['via_llegada']),
                     'costo' => $validator['costo'],
                     'fecha_llegada' => $validator['fecha_llegada']
                 ]);
@@ -155,34 +196,6 @@ class MatrimonioController extends Controller
         }
     }
 
-
-    public function getProcesosPorMes(Request $request){
-      try{
-            $matrimonios=Matrimonio::query()
-            ->when($request->has('day'), function ($query) use ($request) {
-                return $query->whereDay('fecha_llegada', $request->input('day'));
-            })
-            ->when($request->has('mes'), function ($query) use ($request) {
-                return $query->whereMonth('fecha_llegada', $request->input('mes'));
-            })
-            ->when($request->has('anno'), function ($query) use ($request) {
-                return $query->whereYear('fecha_llegada', $request->input('anno'));
-            })
-            ->get();
-
-            if($matrimonios->isNotEmpty()){
-                return response()->json(MatrimonioResource::collection($matrimonios));
-            }else{
-                return response()->json('No hay registros en esa fecha');
-            }
-
-
-      }catch(\Exception $e){
-        return response()->json($e->getMessage());
-      }
-    }
-
-
     public function getPagos(Request $request){
         try{
 
@@ -197,6 +210,14 @@ class MatrimonioController extends Controller
                           ->whereRaw('matrimonios.costo = forma_pagos.monto_pago');
                     });
             })
+            ->when($request->has('nombre'), function ($query) use ($request) {
+                return $query->whereHas('usuario_italiano', function ($query) use ($request){
+                   $query->where(DB::raw('lower(nombre_apellidos)'), 'LIKE', '%' . strtolower($request->input('nombre')) . '%');
+               })
+               ->orWhereHas('usuario_cubano', function ($query) use ($request){
+                   $query->where(DB::raw('lower(nombre_apellidos)'), 'LIKE', '%' . strtolower($request->input('nombre')) . '%');
+               });
+           })
             ->when($request->has('day'), function ($query) use ($request) {
                 return $query->whereDay('fecha_llegada', $request->input('day'));
             })
@@ -206,6 +227,7 @@ class MatrimonioController extends Controller
             ->when($request->has('anno'), function ($query) use ($request) {
                 return $query->whereYear('fecha_llegada', $request->input('anno'));
             })
+            ->with(['flujo1.llegadaDocs','flujo1.formalizarMatrimonio','flujo1.retiroDocs','flujo1.traduccion', 'flujo2.preparacionDocumentos', 'flujo3.preparacionDocumentos'])
             ->get();
 
             return response()->json(MatrimonioResource::collection($matrimonios));
@@ -228,6 +250,14 @@ class MatrimonioController extends Controller
                           ->whereRaw('matrimonios.costo != forma_pagos.monto_pago');
                     });
             })
+            ->when($request->has('nombre'), function ($query) use ($request) {
+                return $query->whereHas('usuario_italiano', function ($query) use ($request){
+                   $query->where(DB::raw('lower(nombre_apellidos)'), 'LIKE', '%' . strtolower($request->input('nombre')) . '%');
+               })
+               ->orWhereHas('usuario_cubano', function ($query) use ($request){
+                   $query->where(DB::raw('lower(nombre_apellidos)'), 'LIKE', '%' . strtolower($request->input('nombre')) . '%');
+               });
+           })
             ->when($request->has('day'), function ($query) use ($request) {
                 return $query->whereDay('fecha_llegada', $request->input('day'));
             })
@@ -237,6 +267,7 @@ class MatrimonioController extends Controller
             ->when($request->has('anno'), function ($query) use ($request) {
                 return $query->whereYear('fecha_llegada', $request->input('anno'));
             })
+            ->with(['flujo1.llegadaDocs','flujo1.formalizarMatrimonio','flujo1.retiroDocs','flujo1.traduccion', 'flujo2.preparacionDocumentos', 'flujo3.preparacionDocumentos'])
             ->get();
 
             return response()->json(MatrimonioResource::collection($matrimonios));

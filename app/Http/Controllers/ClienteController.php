@@ -29,13 +29,39 @@ class ClienteController extends Controller
         return response()->json($respuesta);
     }
 
+
     public function getClienteById(Request $request)
     {
         try {
-            $cliente = cliente::find($request->input('id'));
+            $cliente = cliente::with('matrimonio')->find($request->input('id'));
             return response()->json($cliente);
         } catch (\Exception $e) {
             return response()->json($e->getMessage());
+        }
+    }
+
+    public function busquedaClientes(Request $request){
+        try{
+            $clientes=cliente::query()
+            ->when($request->has('nombre'), function ($query) use ($request) {
+                return $query->where('nombre_apellidos','LIKE', '%'. $request->input('nombre').'%');
+            })
+            ->when($request->has('username'), function ($query) use ($request) {
+                return $query->where('username','LIKE', '%'.$request->input('username').'%');
+            })
+            ->when($request->has('id'), function ($query) use ($request) {
+                return $query->where('id', $request->input('id'));
+            })
+            ->with('cliente_italiano')
+            ->get();
+
+            if($clientes->isNotEmpty()){
+                return response()->json($clientes);
+            }else{
+                return response()->json('No hay registros con esos datos');
+            }
+        }catch(\Exception $error){
+            return response()->json($error->getMessage());
         }
     }
 

@@ -21,7 +21,10 @@ class ClienteItalianoResource extends JsonResource
             'direccion'=>$this->cliente->direccion,
             'telefono'=>$this->cliente->telefono,
             'email'=>$this->cliente->email,
-            'email_registro'=>$this->email_registro
+            'email_registro'=>$this->email_registro,
+            'created_at'=>$this->created_at,
+            'updated_at'=>$this->updated_at,
+
         ];
     }
 }

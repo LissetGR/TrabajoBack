@@ -39,6 +39,7 @@ use App\Models\traduccion14;
 Route::prefix('auth')->group(function () {
     Route::post('login',[AuthController::class, 'login']);
     Route::post('register',[AuthController::class, 'register']);
+    Route::get('getUser',[AuthController::class, 'getUser']);
 });
 
 Route::middleware('auth:sanctum')->group( function () {
@@ -49,6 +50,7 @@ Route::middleware('auth:sanctum')->group( function () {
     // Clientes
     Route::post('createClient',[ClienteController::class, 'create']);
     Route::get('getClient',[ClienteController::class, 'getCliente']);
+    Route::get('getBusquedaClientes',[ClienteController::class, 'busquedaClientes']);
     Route::get('getClientByID',[ClienteController::class, 'getClienteById']);
     Route::delete('deleteClient',[ClienteController::class, 'destroy']);
     Route::put('modificarClient',[ClienteController::class, 'modificar']);
@@ -65,9 +67,9 @@ Route::middleware('auth:sanctum')->group( function () {
     // Matrimonio
     Route::post('createMatrimonio',[MatrimonioController::class, 'create']);
     Route::get('getMatrimonio',[MatrimonioController::class, 'getMatrimonio']);
+    Route::get('buscarMatrimonio',[MatrimonioController::class, 'busquedaMatrimonio']);
     Route::delete('deleteMatrimonio',[MatrimonioController::class, 'destroy']);
     Route::put('modificarMatrimonio',[MatrimonioController::class, 'modificar']);
-    Route::get('getProcesosPorMes',[MatrimonioController::class, 'getProcesosPorMes']);
     Route::get('getPagos',[MatrimonioController::class, 'getPagos']);
     Route::get('getNoPagos',[MatrimonioController::class, 'getNoPagos']);
     Route::get('getAllFlujos',[MatrimonioController::class, 'getAllFlujos']);

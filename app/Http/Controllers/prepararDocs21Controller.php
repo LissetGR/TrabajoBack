@@ -5,13 +5,14 @@ namespace App\Http\Controllers;
 use App\Http\Controllers\Controller;
 use App\Models\preparar_Doc21;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Redis;
 
 class prepararDocs21Controller extends Controller
 {
-    public function getPreparar()
+    public function getPreparar(Request $request)
     {
         try {
-            $preparar = preparar_Doc21::all();
+            $preparar = preparar_Doc21::find($request->input('id'));
             return response()->json($preparar);
         } catch (\Exception $e) {
             return response()->json($e->getMessage());
@@ -49,7 +50,7 @@ class prepararDocs21Controller extends Controller
 
 
             $preparar=preparar_Doc21::findOrFail($request->input('id'));
-            
+
             $preparar->update($validator);
 
             return response()->json($preparar);

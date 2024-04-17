@@ -8,10 +8,10 @@ use Illuminate\Http\Request;
 
 class prepararDocs31Controller extends Controller
 {
-    public function getPreparar()
+    public function getPreparar(Request $request)
     {
         try {
-            $preparar = preparar_Docs31::all();
+            $preparar = preparar_Docs31::find($request->input('id'));
             return response()->json($preparar);
         } catch (\Exception $e) {
             return response()->json($e->getMessage());

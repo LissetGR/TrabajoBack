@@ -8,10 +8,10 @@ use Illuminate\Http\Request;
 
 class traduccion14Controller extends Controller
 {
-    public function getTraduccion()
+    public function getTraduccion(Request $request)
     {
         try {
-            $traduccion = traduccion14::all();
+            $traduccion = traduccion14::find($request->input('id'));
             return response()->json($traduccion);
         } catch (\Exception $e) {
             return response()->json($e->getMessage());

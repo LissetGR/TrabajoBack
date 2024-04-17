@@ -3,16 +3,17 @@
 namespace App\Http\Controllers;
 
 use App\Http\Controllers\Controller;
+use App\Http\Resources\Flujo2Resource;
 use App\Models\Flujo2;
 use App\Models\Matrimonio;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 class flujo2Controller extends Controller
 {
-    public function getFlujo2(){
+    public function getFlujo2(Request $request){
         try{
-               $flujo=Flujo2::all();
-               return response()->json($flujo);
+               $flujo=Flujo2::where('id_matrimonio',$request->input('id'))->get();
+               return response()->json(Flujo2Resource::collection($flujo));
            }catch(\Exception $e){
                return response()->json($e->getMessage());
            }
@@ -34,6 +35,7 @@ class flujo2Controller extends Controller
                 'transc_embajada' => 'nullable|date|date_format:d/m/Y',
                 'sexto_Email' => 'nullable|date|date_format:d/m/Y',
                 'fecha_solicVisa' => 'nullable|date|date_format:d/m/Y',
+                'observaciones'=>'nullable|string',
             ]);
 
             $preparar = $prepararDocs->create($request);
@@ -76,6 +78,7 @@ class flujo2Controller extends Controller
                 'transc_embajada' => 'nullable|date|date_format:d/m/Y',
                 'sexto_Email' => 'nullable|date|date_format:d/m/Y',
                 'fecha_solicVisa' => 'nullable|date|date_format:d/m/Y',
+                'observaciones'=>'nullable|string',
             ]);
 
             $flujo2 = Flujo2::findOrFail($request->input('id_flujo'));
@@ -112,7 +115,7 @@ class flujo2Controller extends Controller
             $flujo->delete();
             $flujo->preparacionDocumentos()->delete();
 
-            return response()->json($flujo);
+            return response()->json(new Flujo2Resource($flujo));
         }catch(\Exception $e){
             return response()->json($e->getMessage());
         }

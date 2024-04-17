@@ -19,6 +19,7 @@ return new class extends Migration
             $table->date('solicitud_visado')->nullable();
             $table->date('retiro_passport')->nullable();
             $table->date('ultimo_Email')->nullable();
+            $table->string('observaciones')->nullable();
 
 
             $table->foreign('id_matrimonio')->references('numero')->on('matrimonios')->onDelete('cascade')->onUpdate('cascade');

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Controllers\Controller;
+use App\Http\Resources\Flujo1Resource;
 use App\Models\Flujo1;
 use App\Models\Matrimonio;
 use Illuminate\Http\Request;
@@ -10,11 +11,11 @@ use Illuminate\Support\Facades\DB;
 class flujo1Controller extends Controller
 {
 
-    public function getFlujo1()
+    public function getFlujo1(Request $request)
     {
         try {
-            $flujo = Flujo1::all();
-            return response()->json($flujo);
+            $flujo = Flujo1::where('id_matrimonio',$request->input('id'))->get();
+            return response()->json(Flujo1Resource::collection($flujo));
         } catch (\Exception $e) {
             return response()->json($e->getMessage());
         }
@@ -44,6 +45,7 @@ class flujo1Controller extends Controller
                 'tercer_Email' => 'nullable|date|date_format:d/m/Y',
                 'cm_minrex' => 'nullable|date|date_format:d/m/Y',
                 'cuarto_Email' => 'nullable|date|date_format:d/m/Y',
+                'observaciones'=>'nullable|string',
             ]);
 
 
@@ -119,7 +121,7 @@ class flujo1Controller extends Controller
             }
             $flujo1->matrimonio()->associate($matrimonio);
 
-            return response()->json($flujo1);
+            return response()->json(new Flujo1Resource($flujo1));
 
         } catch (\Exception $e) {
             DB::rollBack();
@@ -154,6 +156,7 @@ class flujo1Controller extends Controller
                 'tercer_Email' => 'nullable|date|date_format:d/m/Y',
                 'cm_minrex' => 'nullable|date|date_format:d/m/Y',
                 'cuarto_Email' => 'nullable|date|date_format:d/m/Y',
+                'observaciones'=>'nullable|string',
             ]);
 
 
@@ -225,7 +228,7 @@ class flujo1Controller extends Controller
             $matrimonio = Matrimonio::find($request->input('id_matrimonio'));
             $flujo1->matrimonio()->associate($matrimonio);
 
-            return response()->json($flujo1);
+            return response()->json(new Flujo1Resource($flujo1));
 
         } catch (\Exception $e) {
             DB::rollBack();
@@ -246,7 +249,7 @@ class flujo1Controller extends Controller
             $flujo->retiroDocs()->delete();
             $flujo->traduccion()->delete();
 
-            return response()->json($flujo);
+            return response()->json(new Flujo1Resource($flujo));
         }catch(\Exception $e){
             return response()->json($e->getMessage());
         }

@@ -24,14 +24,13 @@ class ClienteItalianoController extends Controller
 
     public function getClienteItalianoById(Request $request){
         try{
-            $cliente= ClienteItaliano::find($request->input('id'));
+            $cliente= ClienteItaliano::with('matrimonio')->find($request->input('id'));
             return response()->json(new ClienteItalianoResource($cliente));
         }catch(\Exception $e){
             return response()->json($e->getMessage());
         }
     }
-
-
+    
     public function create(Request $request){
 
         try{

@@ -9,10 +9,10 @@ use Illuminate\Http\Request;
 
 class observacionesController extends Controller
 {
-    public function getObservaciones()
+    public function getObservaciones(Request $request)
     {
         try {
-            $observaciones = observaciones::all();
+            $observaciones = observaciones::where('id_matrimonio',$request->input('id'))->get();
             return response()->json($observaciones);
         } catch (\Exception $e) {
             return response()->json($e->getMessage());

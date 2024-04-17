@@ -9,9 +9,9 @@ class Flujo2 extends Model
 {
     use HasFactory;
 
-    protected $fillable=['id_matrimonio','id_prepararDocs','cita_trans', 'quinto_Email','transc_embajada','fecha_solicVisa'];
+    protected $fillable=['id_matrimonio','id_prepararDocs','cita_trans', 'quinto_Email','transc_embajada','fecha_solicVisa','observaciones'];
 
-    protected $hiden=['matrimonio', 'preparacionDocumentos'];
+    // protected $hidden=['id_prepararDocs'];
 
     public function matrimonio(){
         return $this->belongsTo(matrimonio::class,'id_matrimonio','numero');

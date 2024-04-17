@@ -9,10 +9,10 @@ use Illuminate\Support\Str;
 
 class llegadaDocs11Controller extends Controller
 {
-     public function getllegadaDoc()
+     public function getllegadaDoc(Request $request)
     {
         try {
-            $llegada = llegada_Doc11::all();
+            $llegada = llegada_Doc11::find($request->input('id'));
             return response()->json($llegada);
         } catch (\Exception $e) {
             return response()->json($e->getMessage());

@@ -9,10 +9,10 @@ use Illuminate\Http\Request;
 
 class formasPagosController extends Controller
 {
-    public function getFormaPago()
+    public function getFormaPago(Request $request)
     {
         try {
-            $forma = formaPago::all();
+            $forma = formaPago::with('cuotas')->where('id_matrimonio',$request->input('id'))->get();
             return response()->json($forma);
         } catch (\Exception $e) {
             return response()->json($e->getMessage());
@@ -62,7 +62,7 @@ class formasPagosController extends Controller
 
            $matrimonio=Matrimonio::find($request->input('id_matrimonio'));
            $forma=formaPago::findOrFail($request->input('id'));
-           
+
            $forma->update($validator);
 
            $forma->matrimonio()->associate($matrimonio);
