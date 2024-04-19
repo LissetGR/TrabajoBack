@@ -5,16 +5,33 @@ namespace App\Http\Controllers;
 use App\Http\Controllers\Controller;
 use App\Models\formalizar_Matrim12;
 use Illuminate\Http\Request;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
+use Illuminate\Validation\ValidationException;
 
 class formalizarMatrimonio12Controller extends Controller
 {
     public function getFormalizar(Request $request){
         try{
-               $form=formalizar_Matrim12::find($request->input('id'));
+            $validator = $request->validate([
+                'id' => 'required|numeric'
+            ]);
+
+               $form=formalizar_Matrim12::findOrFail($validator['id']);
                return response()->json($form);
-           }catch(\Exception $e){
-               return response()->json($e->getMessage());
-           }
+           }catch (ModelNotFoundException $e) {
+            return response()->json([
+                'error' => 'Registro no encontrado',
+                'message' => 'No se pudo encontrar el registro con el ID proporcionado',
+            ], 404);
+            }catch (ValidationException $e) {
+                return response()->json([
+                    'error' => 'Error de validación',
+                    'message' => $e->errors(),
+                ], 422);
+            }
+            catch (\Exception $e) {
+                return response()->json($e->getMessage());
+            }
     }
 
     public function create(Request $request){
@@ -41,7 +58,12 @@ class formalizarMatrimonio12Controller extends Controller
 
             return response()->json($formalizar);
 
-        }catch(\Exception $e){
+        }catch (ValidationException $e) {
+            return response()->json([
+                'error' => 'Error de validación',
+                'message' => $e->errors(),
+            ], 422);
+        }catch (\Exception $e) {
             return response()->json($e->getMessage());
         }
     }
@@ -68,7 +90,19 @@ class formalizarMatrimonio12Controller extends Controller
 
             return response()->json($formalizar);
 
-        }catch(\Exception $e){
+        }catch (ModelNotFoundException $e) {
+            return response()->json([
+                'error' => 'Registro no encontrado',
+                'message' => 'No se pudo encontrar el registro con el ID proporcionado',
+            ], 404);
+        }
+        catch (ValidationException $e) {
+            return response()->json([
+                'error' => 'Error de validación',
+                'message' => $e->errors(),
+            ], 422);
+        }
+        catch (\Exception $e) {
             return response()->json($e->getMessage());
         }
     }
@@ -76,12 +110,29 @@ class formalizarMatrimonio12Controller extends Controller
 
     public function destroy(Request $request){
         try{
-           $formalizar=formalizar_Matrim12::findOrFail($request->input('id'));
+
+            $validator = $request->validate([
+                'id' => 'required|numeric'
+            ]);
+
+           $formalizar=formalizar_Matrim12::findOrFail($validator['id']);
            $formalizar->delete();
 
            return response()->json($formalizar);
-        }catch(\Exception $e){
-            return response()->json($e);
+        }catch (ModelNotFoundException $e) {
+            return response()->json([
+                'error' => 'Registro no encontrado',
+                'message' => 'No se pudo encontrar el registro con el ID proporcionado',
+            ], 404);
+        }
+        catch (ValidationException $e) {
+            return response()->json([
+                'error' => 'Error de validación',
+                'message' => $e->errors(),
+            ], 422);
+        }
+        catch (\Exception $e) {
+            return response()->json($e->getMessage());
         }
     }
 }

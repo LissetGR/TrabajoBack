@@ -6,14 +6,32 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\cuotas;
 use App\Models\formaPago;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
+use Illuminate\Validation\ValidationException;
 
 class cuotasController extends Controller
 {
     public function getCuotas(Request $request){
         try{
-            $cuotas= cuotas::where('id_formaPago',$request->input('id'))->get();
+            $validator=$request->validate([
+                'id'=>'required|numeric'
+            ]);
+            $cuotas= cuotas::where('id_formaPago',$validator['id'])->get();
             return response()->json($cuotas);
-        }catch(\Exception $e){
+
+        }catch (ModelNotFoundException $e) {
+            return response()->json([
+                'error' => 'Registro no encontrado',
+                'message' => 'No se pudo encontrar el registro con el ID proporcionado',
+            ], 404);
+        }
+        catch (ValidationException $e) {
+            return response()->json([
+                'error' => 'Error de validación',
+                'message' => $e->errors(),
+            ], 422);
+        }
+        catch(\Exception $e){
             return response()->json($e->getMessage());
         }
     }
@@ -49,7 +67,12 @@ class cuotasController extends Controller
 
             return response()->json($cuota);
 
-        }catch(\Exception $e){
+        }catch (ValidationException $e) {
+            return response()->json([
+                'error' => 'Error de validación',
+                'message' => $e->errors(),
+            ], 422);
+        } catch (\Exception $e) {
             return response()->json($e->getMessage());
         }
     }
@@ -73,23 +96,50 @@ class cuotasController extends Controller
                     'monto_pago'=> ($cuota->forma_pago->monto_pago-$cantidadA)+$request->input('cantidad'),
                  ]);
             }
-
-
             return response()->json($cuota);
 
-        }catch(\Exception $e){
+        }catch (ModelNotFoundException $e) {
+            return response()->json([
+                'error' => 'Registro no encontrado',
+                'message' => 'No se pudo encontrar el registro con el ID proporcionado'+ $e->getMessage(),
+            ], 404);
+        }
+        catch (ValidationException $e) {
+            return response()->json([
+                'error' => 'Error de validación',
+                'message' => $e->errors(),
+            ], 422);
+        }
+        catch (\Exception $e) {
             return response()->json($e->getMessage());
         }
     }
 
     public function destroy(Request $request){
         try{
-           $cuota=cuotas::findOrFail($request->input('id'));
+            $validator=$request->validate([
+                'id'=>'required|numeric'
+            ]);
+
+           $cuota=cuotas::findOrFail($validator['id']);
            $cuota->delete();
 
            return response()->json($cuota);
-        }catch(\Exception $e){
-            return response()->json($e);
+
+        }catch (ModelNotFoundException $e) {
+            return response()->json([
+                'error' => 'Registro no encontrado',
+                'message' => 'No se pudo encontrar el registro con el ID proporcionado'+ $e->getMessage(),
+            ], 404);
+        }
+        catch (ValidationException $e) {
+            return response()->json([
+                'error' => 'Error de validación',
+                'message' => $e->errors(),
+            ], 422);
+        }
+        catch (\Exception $e) {
+            return response()->json($e->getMessage());
         }
     }
 }

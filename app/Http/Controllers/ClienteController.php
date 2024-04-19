@@ -8,49 +8,86 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use App\Models\cliente;
 use App\Models\ClienteItaliano;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
+use Illuminate\Validation\ValidationException;
 
 class ClienteController extends Controller
 {
     public function getCliente()
     {
-        $clientes=Cliente::doesntHave('cliente_italiano')->get();
-        return response()->json($clientes);
+        try{
+            $clientes=Cliente::doesntHave('cliente_italiano')->get();
+            return response()->json($clientes);
+
+        }catch(\Exception $e){
+            return response()->json($e->getMessage());
+        }
+
     }
 
     public function getAllCliente()
     {
-        $clientes = Cliente::doesntHave('cliente_italiano')->get();
-        $clienteItaliano = ClienteItaliano::all();
+        try{
+            $clientes = Cliente::doesntHave('cliente_italiano')->get();
+            $clienteItaliano = ClienteItaliano::all();
 
-        $respuesta = [
-            'clientes cubanos' => $clientes,
-            'clientes italianos' => ClienteItalianoResource::collection($clienteItaliano)
-        ];
-        return response()->json($respuesta);
+            $respuesta = [
+                'clientes cubanos' => $clientes,
+                'clientes italianos' => ClienteItalianoResource::collection($clienteItaliano)
+            ];
+            return response()->json($respuesta);
+        }catch(\Exception $e){
+            return response()->json($e->getMessage());
+        }
+
     }
 
 
     public function getClienteById(Request $request)
     {
         try {
-            $cliente = cliente::with('matrimonio')->find($request->input('id'));
+            $validator=$request->validate([
+                'id'=>'required|numeric'
+            ]);
+
+            $cliente = cliente::with('matrimonio')->findOrFail($validator['id']);
             return response()->json($cliente);
-        } catch (\Exception $e) {
+        }
+        catch (ModelNotFoundException $e) {
+            return response()->json([
+                'error' => 'Usuario no encontrado',
+                'message' => 'No se pudo encontrar el usuario con el ID proporcionado',
+            ], 404);
+        }
+        catch (ValidationException $e) {
+            return response()->json([
+                'error' => 'Error de validación',
+                'message' => $e->errors(),
+            ], 422);
+        }
+        catch (\Exception $e) {
             return response()->json($e->getMessage());
         }
     }
 
     public function busquedaClientes(Request $request){
         try{
+
+            $validator=$request->validate([
+                'username' => 'string|alpha_dash',
+                'nombre' => 'string',
+                'id'=>'numeric'
+            ]);
+
             $clientes=cliente::query()
-            ->when($request->has('nombre'), function ($query) use ($request) {
-                return $query->where('nombre_apellidos','LIKE', '%'. $request->input('nombre').'%');
+            ->when($request->has('nombre'), function ($query) use ($validator) {
+                return $query->whereRaw('LOWER(nombre_apellidos) LIKE ?', ['%' . strtolower($validator['nombre']) . '%']);
             })
-            ->when($request->has('username'), function ($query) use ($request) {
-                return $query->where('username','LIKE', '%'.$request->input('username').'%');
+            ->when($request->has('username'), function ($query) use ($validator) {
+                return $query->whereRaw('LOWER(username) LIKE ?', ['%' . strtolower($validator['nombre']) . '%']);
             })
-            ->when($request->has('id'), function ($query) use ($request) {
-                return $query->where('id', $request->input('id'));
+            ->when($request->has('id'), function ($query) use ($validator) {
+                return $query->where('id', $validator['id']);
             })
             ->with('cliente_italiano')
             ->get();
@@ -58,9 +95,19 @@ class ClienteController extends Controller
             if($clientes->isNotEmpty()){
                 return response()->json($clientes);
             }else{
-                return response()->json('No hay registros con esos datos');
+                return response()->json([
+                    'error' => 'Usuario no encontrado',
+                    'message' => 'No se pudo encontrar registros con los datos proporcionados',
+                ], 404);
             }
-        }catch(\Exception $error){
+        }
+        catch (ValidationException $e) {
+            return response()->json([
+                'error' => 'Error de validación',
+                'message' => $e->errors(),
+            ], 422);
+        }
+        catch(\Exception $error){
             return response()->json($error->getMessage());
         }
     }
@@ -87,6 +134,12 @@ class ClienteController extends Controller
             $cliente->save();
 
             return response()->json($cliente);
+
+        } catch (ValidationException $e) {
+            return response()->json([
+                'error' => 'Error de validación',
+                'message' => $e->errors(),
+            ], 422);
         } catch (\Exception $e) {
             return response()->json($e->getMessage());
         }
@@ -95,10 +148,25 @@ class ClienteController extends Controller
     public function destroy(Request $request)
     {
         try {
-            $cliente = cliente::findOrFail($request->input('id'));
+            $validator= $request->validate([
+               'id'=>'required|numeric'
+            ]);
+            $cliente = cliente::findOrFail($validator['id']);
             $cliente->delete();
             return response()->json($cliente);
-        } catch (\Exception $e) {
+        }catch (ModelNotFoundException $e) {
+            return response()->json([
+                'error' => 'Usuario no encontrado',
+                'message' => 'No se pudo encontrar el usuario con el ID proporcionado',
+            ], 404);
+        }
+        catch (ValidationException $e) {
+            return response()->json([
+                'error' => 'Error de validación',
+                'message' => $e->errors(),
+            ], 422);
+        }
+        catch (\Exception $e) {
             return response()->json($e->getMessage());
         }
     }
@@ -117,7 +185,20 @@ class ClienteController extends Controller
             $cliente = cliente::findOrFail($request->input('id'));
             $cliente->update($validator);
             return response()->json($cliente);
-        } catch (\Exception $e) {
+        }
+        catch (ModelNotFoundException $e) {
+            return response()->json([
+                'error' => 'Usuario no encontrado',
+                'message' => 'No se pudo encontrar el usuario con el ID proporcionado',
+            ], 404);
+        }
+        catch (ValidationException $e) {
+            return response()->json([
+                'error' => 'Error de validación',
+                'message' => $e->errors(),
+            ], 422);
+        }
+        catch (\Exception $e) {
             return response()->json($e->getMessage());
         }
     }

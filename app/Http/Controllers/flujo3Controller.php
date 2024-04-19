@@ -8,14 +8,31 @@ use Illuminate\Http\Request;
 use App\Models\Flujo3;
 use App\Models\Matrimonio;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
+use Illuminate\Validation\ValidationException;
 
 class flujo3Controller extends Controller
 {
     public function getFlujo3(Request $request)
     {
         try {
-            $flujo = Flujo3::where('id_matrimonio',$request->input('id'))->get();
+
+            $validator = $request->validate([
+                'id' => 'required|numeric'
+            ]);
+
+            $flujo = Flujo3::where('id_matrimonio', $validator['id'])->get();
             return response()->json(Flujo3Resource::collection($flujo));
+        } catch (ModelNotFoundException $e) {
+            return response()->json([
+                'error' => 'Registro no encontrado',
+                'message' => 'No se pudo encontrar el registro con el ID proporcionado',
+            ], 404);
+        } catch (ValidationException $e) {
+            return response()->json([
+                'error' => 'Error de validación',
+                'message' => $e->errors(),
+            ], 422);
         } catch (\Exception $e) {
             return response()->json($e->getMessage());
         }
@@ -35,7 +52,7 @@ class flujo3Controller extends Controller
                     'solicitud_visado' => 'nullable|date|date_format:d/m/Y',
                     'retiro_passport' => 'nullable|date|date_format:d/m/Y',
                     'ultimo_Email' => 'nullable|date|date_format:d/m/Y',
-                    'observaciones'=>'nullable|string',
+                    'observaciones' => 'nullable|string',
                 ]);
 
                 $preparar = $prepararDocs->create($request);
@@ -49,7 +66,7 @@ class flujo3Controller extends Controller
 
                 DB::commit();
 
-                $matrimonio = Matrimonio::find($request->input('id_matrimonio'));
+                $matrimonio = Matrimonio::findOrFail($request->input('id_matrimonio'));
                 $flujo3->preparacionDocumentos()->associate($preparar);
                 $flujo3->matrimonio()->associate($matrimonio);
 
@@ -58,7 +75,19 @@ class flujo3Controller extends Controller
                 DB::rollBack();
                 throw $e;
             };
-        } catch (\Exception $e) {
+        } catch (ValidationException $e) {
+            return response()->json([
+                'error' => 'Error de validación',
+                'message' => $e->errors(),
+            ], 422);
+        }
+        catch (ModelNotFoundException $e) {
+            return response()->json([
+                'error' => 'Registro no encontrado',
+                'message' => 'No se pudo encontrar el registro matrimonio',
+            ], 404);
+        }
+        catch (\Exception $e) {
             return response()->json($e->getMessage());
         }
     }
@@ -77,46 +106,70 @@ class flujo3Controller extends Controller
                     'solicitud_visado' => 'nullable|date|date_format:d/m/Y',
                     'retiro_passport' => 'nullable|date|date_format:d/m/Y',
                     'ultimo_Email' => 'nullable|date|date_format:d/m/Y',
-                    'observaciones'=>'nullable|string',
+                    'observaciones' => 'nullable|string',
                 ]);
 
                 $flujo3 = Flujo3::findOrFail($request->input('id_flujo'));
 
 
-                if($request->anyFilled(['doc_provItalia31','declaracion_alojamiento','reserva_aerea','certificado_residenciaItaliano'])){
+                if ($request->anyFilled(['doc_provItalia31', 'declaracion_alojamiento', 'reserva_aerea', 'certificado_residenciaItaliano'])) {
                     $preparar = $prepararDocs->create($request);
                     $preparar = json_encode($preparar->getData());
                     $preparar = json_decode(($preparar));
-                    $data = $validator + ['id_prepararDocs' => $preparar->id];
-                    $flujo3->update($data);
+                    $validator = $validator + ['id_prepararDocs' => $preparar->id];
                     $flujo3->preparacionDocumentos()->associate($preparar);
-                }else{
-                    $flujo3->update($validator);
                 }
+
+                $flujo3->update($validator);
 
                 DB::commit();
 
-                $matrimonio = Matrimonio::find($request->input('id_matrimonio'));
+                $matrimonio = Matrimonio::findOrFail($request->input('id_matrimonio'));
                 $flujo3->matrimonio()->associate($matrimonio);
 
-                return response()->json($flujo3);
+                return response()->json(new Flujo3Resource($flujo3));
             } catch (\Exception $e) {
                 DB::rollBack();
                 throw $e;
             };
+        } catch (ModelNotFoundException $e) {
+            return response()->json([
+                'error' => 'Registro no encontrado',
+                'message' => 'No se pudo encontrar el registro con el ID proporcionado',
+            ], 404);
+        } catch (ValidationException $e) {
+            return response()->json([
+                'error' => 'Error de validación',
+                'message' => $e->errors(),
+            ], 422);
         } catch (\Exception $e) {
             return response()->json($e->getMessage());
         }
     }
 
-    public function destroy (Request $request){
-        try{
-            $flujo=Flujo3::find($request->input('id'));
+    public function destroy(Request $request)
+    {
+        try {
+            $validator = $request->validate([
+                'id' => 'required|numeric'
+            ]);
+
+            $flujo = Flujo3::with('preparacionDocumentos')->findOrFail($validator['id']);
             $flujo->delete();
             $flujo->preparacionDocumentos()->delete();
 
             return response()->json(new Flujo3Resource($flujo));
-        }catch(\Exception $e){
+        } catch (ModelNotFoundException $e) {
+            return response()->json([
+                'error' => 'Registro no encontrado',
+                'message' => 'No se pudo encontrar el registro con el ID proporcionado',
+            ], 404);
+        } catch (ValidationException $e) {
+            return response()->json([
+                'error' => 'Error de validación',
+                'message' => $e->errors(),
+            ], 422);
+        } catch (\Exception $e) {
             return response()->json($e->getMessage());
         }
     }

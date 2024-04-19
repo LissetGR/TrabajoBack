@@ -14,7 +14,9 @@ use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
-
+use Illuminate\Database\Eloquent\ModelNotFoundException;
+use Illuminate\Validation\ValidationException;
+use Carbon\Carbon;
 use function PHPUnit\Framework\isEmpty;
 
 class MatrimonioController extends Controller
@@ -22,51 +24,92 @@ class MatrimonioController extends Controller
     public function getMatrimonio(Request $request)
     {
         try {
-            $matrimonio = matrimonio::with(['flujo1.llegadaDocs','flujo1.formalizarMatrimonio','flujo1.retiroDocs','flujo1.traduccion', 'flujo2.preparacionDocumentos', 'flujo3.preparacionDocumentos'])->find($request->input('id'));
+            $validator = $request->validate([
+                'numero' => 'numeric|required'
+            ]);
+
+            $matrimonio = matrimonio::with(['flujo1.llegadaDocs', 'flujo1.formalizarMatrimonio', 'flujo1.retiroDocs', 'flujo1.traduccion', 'flujo2.preparacionDocumentos', 'flujo3.preparacionDocumentos'])->findOrFail($validator['numero']);
             return response()->json(new MatrimonioResource($matrimonio));
+        } catch (ModelNotFoundException $e) {
+            return response()->json([
+                'error' => 'Registro no encontrado',
+                'message' => 'No se pudo encontrar el registro con el ID proporcionado',
+            ], 404);
+        } catch (ValidationException $e) {
+            return response()->json([
+                'error' => 'Error de validación',
+                'message' => $e->errors(),
+            ], 422);
         } catch (\Exception $e) {
             return response()->json($e->getMessage());
         }
     }
 
-    public function busquedaMatrimonio(Request $request){
-        try{
+    public function busquedaMatrimonio(Request $request)
+    {
+        try {
+            $current_year = Carbon::now()->year;
+            $hundred_years_ago = (new Carbon("100 years ago"))->year;
 
-            $matrimonios=Matrimonio::query()
-            ->when($request->has('nombre'), function ($query) use ($request) {
-                  $query->whereHas('usuario_italiano', function ($query) use ($request){
-                    $query->where(DB::raw('lower(nombre_apellidos)'), 'LIKE', '%' . strtolower($request->input('nombre')) . '%');
+            $validator = $request->validate([
+                'username' => 'string|alpha_dash',
+                'nombre' => 'string',
+                'numero' => 'numeric',
+                'tipo' => [
+                    'required', 'string',
+                    function ($attribute, $value, $fail) {
+                        $allowedValues = ['Per procura', 'Congiunto'];
+                        if (!in_array(strtolower($value), array_map('strtolower', $allowedValues))) {
+                            $fail($attribute . ' Campo no valido');
+                        }
+                    }
+                ],
+                'anno' => 'integer|between:' . $hundred_years_ago . ',' . $current_year,
+                'mes' => 'integer|between:1,12',
+                'dia' => 'integer|between:1,31',
+            ]);
+
+            $matrimonios = Matrimonio::query()
+                ->when($request->has('nombre'), function ($query) use ($validator) {
+                    $query->whereHas('usuario_italiano', function ($query) use ($validator) {
+                        $query->where(DB::raw('lower(nombre_apellidos)'), 'LIKE', '%' . strtolower($validator['nombre']) . '%');
+                    })
+                        ->orWhereHas('usuario_cubano', function ($query) use ($validator) {
+                            $query->where(DB::raw('lower(nombre_apellidos)'), 'LIKE', '%' . strtolower($validator['nombre']) . '%');
+                        });
                 })
-                ->orWhereHas('usuario_cubano', function ($query) use ($request){
-                    $query->where(DB::raw('lower(nombre_apellidos)'), 'LIKE', '%' . strtolower($request->input('nombre')) . '%');
-                });
-            })
-            ->when($request->has('numero'), function ($query) use ($request) {
-                return $query->where('numero', $request->input('numero'));
-            })
-            ->when($request->has('tipo'), function ($query) use ($request) {
-                return $query->where(DB::raw('lower(tipo)'), 'LIKE', '%' . strtolower($request->input('tipo')) . '%');
-            })
-            ->when($request->has('day'), function ($query) use ($request) {
-                return $query->whereDay('fecha_llegada', $request->input('day'));
-            })
-            ->when($request->has('mes'), function ($query) use ($request) {
-                return $query->whereMonth('fecha_llegada', $request->input('mes'));
-            })
-            ->when($request->has('anno'), function ($query) use ($request) {
-                return $query->whereYear('fecha_llegada', $request->input('anno'));
-            })
-            ->with(['flujo1.llegadaDocs','flujo1.formalizarMatrimonio','flujo1.retiroDocs','flujo1.traduccion', 'flujo2.preparacionDocumentos', 'flujo3.preparacionDocumentos'])
-            ->get();
+                ->when($request->has('numero'), function ($query) use ($validator) {
+                    return $query->where('numero', $validator['numero']);
+                })
+                ->when($request->has('tipo'), function ($query) use ($validator) {
+                    return $query->where(DB::raw('lower(tipo)'), 'LIKE', '%' . strtolower($validator['tipo'] . '%'));
+                })
+                ->when($request->has('day'), function ($query) use ($validator) {
+                    return $query->whereDay('fecha_llegada', $validator['day']);
+                })
+                ->when($request->has('mes'), function ($query) use ($validator) {
+                    return $query->whereMonth('fecha_llegada', $validator['mes']);
+                })
+                ->when($request->has('anno'), function ($query) use ($validator) {
+                    return $query->whereYear('fecha_llegada', $validator['anno']);
+                })
+                ->get();
 
-            if($matrimonios->isNotEmpty()){
+            if ($matrimonios->isNotEmpty()) {
                 return response()->json(MatrimonioResource::collection($matrimonios));
-            }else{
-                return response()->json('No hay registros con esos datos');
+            } else {
+                return response()->json([
+                    'error' => 'Registro no encontrado',
+                    'message' => 'No se pudo encontrar registros con los datos proporcionados',
+                ], 404);
             }
-
-        }catch(\Exception $e){
-            return response()->json($e->getMessage());
+        } catch (ValidationException $e) {
+            return response()->json([
+                'error' => 'Error de validación',
+                'message' => $e->errors(),
+            ], 422);
+        } catch (\Exception $error) {
+            return response()->json($error->getMessage());
         }
     }
 
@@ -101,7 +144,7 @@ class MatrimonioController extends Controller
             ]);
 
 
-            $username_italiano =Cliente::has('cliente_italiano')
+            $username_italiano = Cliente::has('cliente_italiano')
                 ->where('clientes.username', $validator['username_italiano'])
                 ->first();
 
@@ -122,6 +165,11 @@ class MatrimonioController extends Controller
 
 
             return response()->json(new MatrimonioResource($matrimonio));
+        } catch (ValidationException $e) {
+            return response()->json([
+                'error' => 'Error de validación',
+                'message' => $e->errors(),
+            ], 422);
         } catch (\Exception $e) {
             return response()->json($e->getMessage());
         }
@@ -157,29 +205,33 @@ class MatrimonioController extends Controller
             ]);
 
             $username_italiano =  Cliente::join('cliente_italianos', 'clientes.id', '=', 'cliente_italianos.id')
-            ->where('clientes.username', $validator['username_italiano'])
-            ->first();
+                ->where('clientes.username', $validator['username_italiano'])
+                ->first();
 
             $username_cubano = Cliente::whereRaw('LOWER(username) = ?', [strtolower($validator['username_cubano'])])->first();
 
 
-            try {
-                $matrimonio = Matrimonio::find($validator['numero']);
-                $matrimonio->update([
-                    'tipo' => Str::ucfirst($validator['tipo']),
-                    'username_cubano' => $username_cubano->id,
-                    'username_italiano' => $username_italiano->id,
-                    'via_llegada' => Str::ucfirst($validator['via_llegada']),
-                    'costo' => $validator['costo'],
-                    'fecha_llegada' => $validator['fecha_llegada']
-                ]);
-            } catch (\Exception $e) {
-                return response()->json($e->getMessage());
-            }
 
-
-
+            $matrimonio = Matrimonio::findOrFail($validator['numero']);
+            $matrimonio->update([
+                'tipo' => Str::ucfirst($validator['tipo']),
+                'username_cubano' => $username_cubano->id,
+                'username_italiano' => $username_italiano->id,
+                'via_llegada' => Str::ucfirst($validator['via_llegada']),
+                'costo' => $validator['costo'],
+                'fecha_llegada' => $validator['fecha_llegada']
+            ]);
             return response()->json(new MatrimonioResource($matrimonio));
+        } catch (ModelNotFoundException $e) {
+            return response()->json([
+                'error' => 'Registro no encontrado',
+                'message' => 'No se pudo encontrar el registro con el ID proporcionado',
+            ], 404);
+        } catch (ValidationException $e) {
+            return response()->json([
+                'error' => 'Error de validación',
+                'message' => $e->errors(),
+            ], 422);
         } catch (\Exception $e) {
             return response()->json($e->getMessage());
         }
@@ -188,120 +240,210 @@ class MatrimonioController extends Controller
     public function destroy(Request $request)
     {
         try {
-            $matrimonio = Matrimonio::findOrFail($request->input('numero'));
+            $validator = $request->validate([
+                'numero' => 'numeric|required'
+            ]);
+
+            $matrimonio = Matrimonio::findOrFail($validator['numero']);
             $matrimonio->delete();
             return response()->json(new MatrimonioResource($matrimonio));
+        } catch (ModelNotFoundException $e) {
+            return response()->json([
+                'error' => 'Registro no encontrado',
+                'message' => 'No se pudo encontrar el registro con el ID proporcionado',
+            ], 404);
+        } catch (ValidationException $e) {
+            return response()->json([
+                'error' => 'Error de validación',
+                'message' => $e->errors(),
+            ], 422);
         } catch (\Exception $e) {
             return response()->json($e->getMessage());
         }
     }
 
-    public function getPagos(Request $request){
-        try{
+    public function getPagos(Request $request)
+    {
+        try {
+            $current_year = Carbon::now()->year;
+            $hundred_years_ago = (new Carbon("100 years ago"))->year;
+
+            $validator = $request->validate([
+                'nombre' => 'string',
+                'numero' => 'numeric',
+                'forma_pago' => 'string',
+                function ($attribute, $value, $fail) {
+                    $allowedValues = ['Pagato totale', 'Acconto'];
+                    if (!in_array(strtolower($value), array_map('strtolower', $allowedValues))) {
+                        $fail($attribute . ' Campo no valido');
+                    }
+                },
+                'anno' => 'integer|between:' . $hundred_years_ago . ',' . $current_year,
+                'mes' => 'integer|between:1,12',
+                'dia' => 'integer|between:1,31',
+            ]);
+
 
             $matrimonios = Matrimonio::whereHas('forma_pago', function ($query) {
                 $query->where('tipo', 'Pagato totale');
             })
-            ->orWhereHas('forma_pago', function ($query) {
-                $query->where('tipo', 'Acconto')
-                ->whereExists(function ($query) {
-                    $query->select(DB::raw(1))
-                          ->from('matrimonios')
-                          ->whereRaw('matrimonios.costo = forma_pagos.monto_pago');
-                    });
-            })
-            ->when($request->has('nombre'), function ($query) use ($request) {
-                return $query->whereHas('usuario_italiano', function ($query) use ($request){
-                   $query->where(DB::raw('lower(nombre_apellidos)'), 'LIKE', '%' . strtolower($request->input('nombre')) . '%');
-               })
-               ->orWhereHas('usuario_cubano', function ($query) use ($request){
-                   $query->where(DB::raw('lower(nombre_apellidos)'), 'LIKE', '%' . strtolower($request->input('nombre')) . '%');
-               });
-           })
-            ->when($request->has('day'), function ($query) use ($request) {
-                return $query->whereDay('fecha_llegada', $request->input('day'));
-            })
-            ->when($request->has('mes'), function ($query) use ($request) {
-                return $query->whereMonth('fecha_llegada', $request->input('mes'));
-            })
-            ->when($request->has('anno'), function ($query) use ($request) {
-                return $query->whereYear('fecha_llegada', $request->input('anno'));
-            })
-            ->with(['flujo1.llegadaDocs','flujo1.formalizarMatrimonio','flujo1.retiroDocs','flujo1.traduccion', 'flujo2.preparacionDocumentos', 'flujo3.preparacionDocumentos'])
-            ->get();
+                ->orWhereHas('forma_pago', function ($query) {
+                    $query->where('tipo', 'Acconto')
+                        ->whereExists(function ($query) {
+                            $query->select(DB::raw(1))
+                                ->from('matrimonios')
+                                ->whereRaw('matrimonios.costo = forma_pagos.monto_pago');
+                        });
+                })
+                ->when($request->has('nombre'), function ($query) use ($validator) {
+                    return $query->whereHas('usuario_italiano', function ($query) use ($validator) {
+                        $query->where(DB::raw('lower(nombre_apellidos)'), 'LIKE', '%' . strtolower($validator['nombre'] . '%'));
+                    })
+                        ->orWhereHas('usuario_cubano', function ($query) use ($validator) {
+                            $query->where(DB::raw('lower(nombre_apellidos)'), 'LIKE', '%' . strtolower($validator['nombre'] . '%'));
+                        });
+                })
+                ->when($request->has('day'), function ($query) use ($validator) {
+                    return $query->whereDay('fecha_llegada', $validator['day']);
+                })
+                ->when($request->has('mes'), function ($query) use ($validator) {
+                    return $query->whereMonth('fecha_llegada', $validator['mes']);
+                })
+                ->when($request->has('anno'), function ($query) use ($validator) {
+                    return $query->whereYear('fecha_llegada', $validator['anno']);
+                })
+                ->with(['flujo1.llegadaDocs', 'flujo1.formalizarMatrimonio', 'flujo1.retiroDocs', 'flujo1.traduccion', 'flujo2.preparacionDocumentos', 'flujo3.preparacionDocumentos'])
+                ->get();
 
-            return response()->json(MatrimonioResource::collection($matrimonios));
-        }catch(\Exception $e){
-            return response()->json($e->getMessage());
+            if ($matrimonios->isNotEmpty()) {
+                return response()->json(MatrimonioResource::collection($matrimonios));
+            } else {
+                return response()->json([
+                    'error' => 'Registro no encontrado',
+                    'message' => 'No se pudo encontrar registros con los datos proporcionados',
+                ], 404);
+            }
+        } catch (ValidationException $e) {
+            return response()->json([
+                'error' => 'Error de validación',
+                'message' => $e->errors(),
+            ], 422);
+        } catch (\Exception $error) {
+            return response()->json($error->getMessage());
         }
     }
 
-    public function getNoPagos(Request $request){
-        try{
+    public function getNoPagos(Request $request)
+    {
+        try {
+
+            $current_year = Carbon::now()->year;
+            $hundred_years_ago = (new Carbon("100 years ago"))->year;
+
+            $validator = $request->validate([
+                'nombre' => 'string',
+                'numero' => 'numeric',
+                'forma_pago' => 'string',
+                function ($attribute, $value, $fail) {
+                    $allowedValues = ['Pagato totale', 'Acconto'];
+                    if (!in_array(strtolower($value), array_map('strtolower', $allowedValues))) {
+                        $fail($attribute . ' Campo no valido');
+                    }
+                },
+                'anno' => 'integer|between:' . $hundred_years_ago . ',' . $current_year,
+                'mes' => 'integer|between:1,12',
+                'dia' => 'integer|between:1,31',
+            ]);
 
             $matrimonios = Matrimonio::whereDoesntHave('forma_pago', function ($query) {
                 $query->where('tipo', 'Pagato totale');
             })
-            ->orWhereHas('forma_pago', function ($query) {
-                $query->where('tipo', 'Acconto')
-                ->whereExists(function ($query) {
-                    $query->select(DB::raw(1))
-                          ->from('matrimonios')
-                          ->whereRaw('matrimonios.costo != forma_pagos.monto_pago');
-                    });
-            })
-            ->when($request->has('nombre'), function ($query) use ($request) {
-                return $query->whereHas('usuario_italiano', function ($query) use ($request){
-                   $query->where(DB::raw('lower(nombre_apellidos)'), 'LIKE', '%' . strtolower($request->input('nombre')) . '%');
-               })
-               ->orWhereHas('usuario_cubano', function ($query) use ($request){
-                   $query->where(DB::raw('lower(nombre_apellidos)'), 'LIKE', '%' . strtolower($request->input('nombre')) . '%');
-               });
-           })
-            ->when($request->has('day'), function ($query) use ($request) {
-                return $query->whereDay('fecha_llegada', $request->input('day'));
-            })
-            ->when($request->has('mes'), function ($query) use ($request) {
-                return $query->whereMonth('fecha_llegada', $request->input('mes'));
-            })
-            ->when($request->has('anno'), function ($query) use ($request) {
-                return $query->whereYear('fecha_llegada', $request->input('anno'));
-            })
-            ->with(['flujo1.llegadaDocs','flujo1.formalizarMatrimonio','flujo1.retiroDocs','flujo1.traduccion', 'flujo2.preparacionDocumentos', 'flujo3.preparacionDocumentos'])
-            ->get();
+                ->orWhereHas('forma_pago', function ($query) {
+                    $query->where('tipo', 'Acconto')
+                        ->whereExists(function ($query) {
+                            $query->select(DB::raw(1))
+                                ->from('matrimonios')
+                                ->whereRaw('matrimonios.costo != forma_pagos.monto_pago');
+                        });
+                })
+                ->when($request->has('nombre'), function ($query) use ($validator) {
+                    return $query->whereHas('usuario_italiano', function ($query) use ($validator) {
+                        $query->where(DB::raw('lower(nombre_apellidos)'), 'LIKE', '%' . strtolower($validator['nombre'] . '%'));
+                    })
+                        ->orWhereHas('usuario_cubano', function ($query) use ($validator) {
+                            $query->where(DB::raw('lower(nombre_apellidos)'), 'LIKE', '%' . strtolower($validator['nombre'] . '%'));
+                        });
+                })
+                ->when($request->has('day'), function ($query) use ($validator) {
+                    return $query->whereDay('fecha_llegada', $validator['day']);
+                })
+                ->when($request->has('mes'), function ($query) use ($validator) {
+                    return $query->whereMonth('fecha_llegada', $validator['mes']);
+                })
+                ->when($request->has('anno'), function ($query) use ($validator) {
+                    return $query->whereYear('fecha_llegada', $validator['anno']);
+                })
+                ->with(['flujo1.llegadaDocs', 'flujo1.formalizarMatrimonio', 'flujo1.retiroDocs', 'flujo1.traduccion', 'flujo2.preparacionDocumentos', 'flujo3.preparacionDocumentos'])
+                ->get();
 
-            return response()->json(MatrimonioResource::collection($matrimonios));
-        }catch(\Exception $e){
-            return response()->json($e->getMessage());
+            if ($matrimonios->isNotEmpty()) {
+                return response()->json(MatrimonioResource::collection($matrimonios));
+            } else {
+                return response()->json([
+                    'error' => 'Registro no encontrado',
+                    'message' => 'No se pudo encontrar registros con los datos proporcionados',
+                ], 404);
+            }
+        } catch (ValidationException $e) {
+            return response()->json([
+                'error' => 'Error de validación',
+                'message' => $e->errors(),
+            ], 422);
+        } catch (\Exception $error) {
+            return response()->json($error->getMessage());
         }
     }
 
 
-    public function getAllFlujos(Request $request){
-      try{
-        $flujo1= Flujo1::where('id_matrimonio',$request->input('id'))->first();
-        $flujo2= Flujo2::where('id_matrimonio',$request->input('id'))->first();
-        $flujo3= Flujo3::where('id_matrimonio',$request->input('id'))->first();
+    public function getAllFlujos(Request $request)
+    {
+        try {
+            $validator = $request->validate([
+                'id' => 'numeric|required'
+            ]);
 
-        if (isset($flujo1)) {
-            $respuesta = [
-                'flujo1'=>$flujo1,
-            ];
-        }
-        if (isset($flujo2)) {
-           $respuesta=$respuesta+[
-             "flujo2"=>$flujo2,
-           ];
-        }
-        if (isset($flujo3)) {
-            $respuesta=$respuesta+[
-             "flujo3"=>$flujo3,
-            ];
-        }
-        return response()->json($respuesta);
-      }catch(\Exception $e){
-        return response()->json($e->getMessage());
-      }
+            $flujo1 = Flujo1::where('id_matrimonio', $validator['id'])->first();
+            $flujo2 = Flujo2::where('id_matrimonio', $validator['id'])->first();
+            $flujo3 = Flujo3::where('id_matrimonio', $validator['id'])->first();
 
+            if (isset($flujo1)) {
+                $respuesta = [
+                    'flujo1' => $flujo1,
+                ];
+            }
+            if (isset($flujo2)) {
+                $respuesta = $respuesta + [
+                    "flujo2" => $flujo2,
+                ];
+            }
+            if (isset($flujo3)) {
+                $respuesta = $respuesta + [
+                    "flujo3" => $flujo3,
+                ];
+            }
+            return response()->json($respuesta);
+        } catch (ModelNotFoundException $e) {
+            return response()->json([
+                'error' => 'Registro no encontrado',
+                'message' => 'No se pudo encontrar el registro con el ID proporcionado',
+            ], 404);
+        } catch (ValidationException $e) {
+            return response()->json([
+                'error' => 'Error de validación',
+                'message' => $e->errors(),
+            ], 422);
+        } catch (\Exception $e) {
+            return response()->json($e->getMessage());
+        }
     }
 }

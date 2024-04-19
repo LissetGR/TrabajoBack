@@ -16,14 +16,13 @@ class MatrimonioResource extends JsonResource
     {
         return [
             'numero'=>$this->numero,
-            'username_italiano'=>$this->usuario_italiano->nombre_apellidos,
-            'username_cubano'=>$this->usuario_cubano->nombre_apellidos,
+            'username_italiano'=>$this->usuario_italiano,
+            'username_cubano'=>$this->usuario_cubano,
             'fecha_llegada'=>$this->fecha_llegada,
             'costo'=>$this->costo,
             'tipo'=>$this->tipo,
             'via_llegada'=>$this->via_llegada,
-            'forma_pago'=>$this->forma_pago->tipo,
-            'cantidad_paga'=>$this->forma_pago->monto_pago,
+            'forma_pago'=>$this->forma_pago,
             'observaciones'=>$this->observaciones,
             'flujo1'=>new Flujo1Resource($this->flujo1),
             'flujo2'=>new Flujo2Resource($this->flujo2),

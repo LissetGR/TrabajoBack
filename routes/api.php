@@ -37,13 +37,14 @@ use App\Models\traduccion14;
 |
 */
 Route::prefix('auth')->group(function () {
-    Route::post('login',[AuthController::class, 'login']);
+    Route::post('login',[AuthController::class, 'login'])->name('login');
     Route::post('register',[AuthController::class, 'register']);
     Route::get('getUser',[AuthController::class, 'getUser']);
 });
 
 Route::middleware('auth:sanctum')->group( function () {
     Route::post('update',[AuthController::class, 'updatePassword']);
+    Route::put('modificar',[AuthController::class, 'modificar']);
     Route::post('logout',[AuthController::class, 'logout']);
     Route::get('getUser',[AuthController::class, 'getUser']);
 
