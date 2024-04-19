@@ -7,6 +7,7 @@ use App\Http\Resources\Flujo3Resource;
 use Illuminate\Http\Request;
 use App\Models\Flujo3;
 use App\Models\Matrimonio;
+use App\Models\preparar_Docs31;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Validation\ValidationException;
@@ -59,9 +60,15 @@ class flujo3Controller extends Controller
                 $preparar = json_encode($preparar->getData());
                 $preparar = json_decode(($preparar));
 
-                // if($request->has(''))
+                if (!property_exists($preparar, 'error')) {
+                    $data = $validator + ['id_prepararDocs' => $preparar->id];
+                } else {
+                    return response()->json([
+                        'error' => $preparar->error,
+                        'message' => $preparar->message,
+                    ], 500);
+                }
 
-                $data = $validator + ['id_prepararDocs' => $preparar->id];
                 $flujo3 = Flujo3::create($data);
 
                 DB::commit();
@@ -80,14 +87,12 @@ class flujo3Controller extends Controller
                 'error' => 'Error de validación',
                 'message' => $e->errors(),
             ], 422);
-        }
-        catch (ModelNotFoundException $e) {
+        } catch (ModelNotFoundException $e) {
             return response()->json([
                 'error' => 'Registro no encontrado',
                 'message' => 'No se pudo encontrar el registro matrimonio',
             ], 404);
-        }
-        catch (\Exception $e) {
+        } catch (\Exception $e) {
             return response()->json($e->getMessage());
         }
     }
@@ -116,8 +121,16 @@ class flujo3Controller extends Controller
                     $preparar = $prepararDocs->create($request);
                     $preparar = json_encode($preparar->getData());
                     $preparar = json_decode(($preparar));
-                    $validator = $validator + ['id_prepararDocs' => $preparar->id];
-                    $flujo3->preparacionDocumentos()->associate($preparar);
+
+                    if (!property_exists($preparar, 'error')) {
+                        $validator = $validator + ['id_prepararDocs' => $preparar->id];
+                        $flujo3->preparacionDocumentos()->associate($preparar);
+                    } else {
+                        return response()->json([
+                            'error' => $preparar->error,
+                            'message' => $preparar->message,
+                        ], 500);
+                    }
                 }
 
                 $flujo3->update($validator);

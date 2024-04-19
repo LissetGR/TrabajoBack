@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Resources\Flujo2Resource;
 use App\Models\Flujo2;
 use App\Models\Matrimonio;
+use App\Models\preparar_Doc21;
 use Illuminate\Http\Request;
 use Illuminate\Validation\ValidationException;
 use Illuminate\Support\Facades\DB;
@@ -60,8 +61,15 @@ class flujo2Controller extends Controller
                 $preparar = json_encode($preparar->getData());
                 $preparar = json_decode(($preparar));
 
+                if (!property_exists($preparar , 'error')) {
+                    $data = $validator + ['id_prepararDocs' => $preparar->id];
+                } else {
+                    return response()->json([
+                        'error' => $preparar->error,
+                        'message' => $preparar->message,
+                    ], 500);
+                }
 
-                $data = $validator + ['id_prepararDocs' => $preparar->id];
                 $flujo2 = Flujo2::create($data);
 
                 DB::commit();
@@ -116,10 +124,17 @@ class flujo2Controller extends Controller
                     $preparar = $prepararDocs->modificar($request);
                     $preparar = json_encode($preparar->getData());
                     $preparar = json_decode(($preparar));
-                    $validator = $validator + ['id_prepararDocs' => $preparar->id];
-                    $flujo2->preparacionDocumentos()->associate($preparar);
-                }
 
+                    if (!property_exists($preparar , 'error')) {
+                        $validator = $validator + ['id_prepararDocs' => $preparar->id];
+                        $flujo2->preparacionDocumentos()->associate($preparar);
+                    } else {
+                        return response()->json([
+                            'error' => $preparar->error,
+                            'message' => $preparar->message,
+                        ], 500);
+                    }
+                }
                 $flujo2->update($validator);
 
                 DB::commit();

@@ -5,7 +5,11 @@ namespace App\Http\Controllers;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\Flujo1Resource;
 use App\Models\Flujo1;
+use App\Models\formalizar_Matrim12;
+use App\Models\llegada_Doc11;
 use App\Models\Matrimonio;
+use App\Models\retirar_Doc13;
+use App\Models\traduccion14;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
@@ -74,15 +78,17 @@ class flujo1Controller extends Controller
                     ];
                     $requestD = new \Illuminate\Http\Request();
                     $requestD->replace($datos);
-                    try {
-                        $llegada = $llegadaController->create($requestD);
-                        $llegada = json_encode($llegada->getData());
-                        $llegada = json_decode(($llegada));
+
+                    $llegada = $llegadaController->create($requestD);
+                    $llegada = json_encode($llegada->getData());
+                    $llegada = json_decode(($llegada));
+
+                    if (!property_exists($llegada, 'error')) {
                         $data = $validator + ['id_llegada_documentos' => $llegada->id];
-                    } catch (\Exception $e) {
+                    } else {
                         return response()->json([
-                            'error' => 'Error al crear el registro de llegada de documentos',
-                            'message' => $e->getMessage(),
+                            'error' => $llegada->error,
+                            'message' => $llegada->message,
                         ], 500);
                     }
                 }
@@ -95,15 +101,17 @@ class flujo1Controller extends Controller
                     $requestD = new \Illuminate\Http\Request();
                     $requestD->replace($datos);
 
-                    try {
-                        $formalizar = $formalizarController->create($requestD);
-                        $formalizar = json_encode($formalizar->getData());
-                        $formalizar = json_decode(($formalizar));
+
+                    $formalizar = $formalizarController->create($requestD);
+                    $formalizar = json_encode($formalizar->getData());
+                    $formalizar = json_decode(($formalizar));
+
+                    if (!property_exists($formalizar, 'error')) {
                         $data = $data + ['id_formalizarMatrimonio' => $formalizar->id];
-                    } catch (\Exception $e) {
+                    } else {
                         return response()->json([
-                            'error' => 'Error al crear el registro de formalizar matrimonio',
-                            'message' => $e->getMessage(),
+                            'error' => $formalizar->error,
+                            'message' => $formalizar->message,
                         ], 500);
                     }
                 }
@@ -115,15 +123,18 @@ class flujo1Controller extends Controller
                     $requestD = new \Illuminate\Http\Request();
                     $requestD->replace($datos);
 
-                    try {
-                        $retirar = $retirarController->create($requestD);
-                        $retirar = json_encode($retirar->getData());
-                        $retirar = json_decode(($retirar));
+
+                    $retirar = $retirarController->create($requestD);
+                    $retirar = json_encode($retirar->getData());
+                    $retirar = json_decode(($retirar));
+
+
+                    if (!property_exists($retirar, 'error')) {
                         $data = $data + ['id_retiroDocsMinrex' => $retirar->id];
-                    } catch (\Exception $e) {
+                    } else {
                         return response()->json([
-                            'error' => 'Error al crear el registro retiro de documentos',
-                            'message' => $e->getMessage(),
+                            'error' => $retirar->error,
+                            'message' => $retirar->message,
                         ], 500);
                     }
                 }
@@ -135,15 +146,18 @@ class flujo1Controller extends Controller
                     $requestD = new \Illuminate\Http\Request();
                     $requestD->replace($datos);
 
-                    try {
-                        $traduccion = $traduccionController->create($requestD);
-                        $traduccion = json_encode($traduccion->getData());
-                        $traduccion = json_decode(($traduccion));
+
+                    $traduccion = $traduccionController->create($requestD);
+                    $traduccion = json_encode($traduccion->getData());
+                    $traduccion = json_decode(($traduccion));
+
+
+                    if (!property_exists($traduccion, 'error')) {
                         $data = $data + ['id_traduccion' => $traduccion->id];
-                    } catch (\Exception $e) {
+                    } else {
                         return response()->json([
-                            'error' => 'Error al crear el registro de traduccion',
-                            'message' => $e->getMessage(),
+                            'error' => $traduccion->error,
+                            'message' => $traduccion->message,
                         ], 500);
                     }
                 }
@@ -166,11 +180,11 @@ class flujo1Controller extends Controller
                 $flujo1->matrimonio()->associate($matrimonio);
 
                 return response()->json($flujo1);
-        } catch (\Exception $e) {
-            DB::rollBack();
-            throw $e;
-        };
-        }catch (ModelNotFoundException $e) {
+            } catch (\Exception $e) {
+                DB::rollBack();
+                throw $e;
+            };
+        } catch (ModelNotFoundException $e) {
             return response()->json([
                 'error' => 'Registro no encontrado',
                 'message' => 'No se pudo encontrar el registro con el ID proporcionado',
@@ -228,7 +242,15 @@ class flujo1Controller extends Controller
                     $llegada = $llegadaController->modificar($requestD);
                     $llegada = json_encode($llegada->getData());
                     $llegada = json_decode(($llegada));
-                    $data = $validator + ['id_llegada_documentos' => $llegada->id];
+
+                    if (!property_exists($llegada, 'error')) {
+                        $data = $validator + ['id_llegada_documentos' => $llegada->id];
+                    } else {
+                        return response()->json([
+                            'error' => $llegada->error,
+                            'message' => $llegada->message,
+                        ], 500);
+                    }
                 }
                 if ($request->Filled(['id_formalizar', 'tipo', 'lugar', 'fecha_formalizar'])) {
                     $datos = [
@@ -243,7 +265,15 @@ class flujo1Controller extends Controller
                     $formalizar = $formalizarController->modificar($requestD);
                     $formalizar = json_encode($formalizar->getData());
                     $formalizar = json_decode(($formalizar));
-                    $data = $data + ['id_formalizarMatrimonio' => $formalizar->id];
+
+                    if (!property_exists($formalizar, 'error')) {
+                        $data = $data + ['id_formalizarMatrimonio' => $formalizar->id];
+                    } else {
+                        return response()->json([
+                            'error' => $formalizar->error,
+                            'message' => $formalizar->message,
+                        ], 500);
+                    }
                 }
                 if ($request->Filled(['id_retirar', 'fecha_ProcuraRetirar', 'fecha_MatrimonioRetirar'])) {
                     $datos = [
@@ -257,7 +287,15 @@ class flujo1Controller extends Controller
                     $retirar = $retirarController->modificar($requestD);
                     $retirar = json_encode($retirar->getData());
                     $retirar = json_decode(($retirar));
-                    $data = $data + ['id_retiroDocsMinrex' => $retirar->id];
+
+                    if (!property_exists($retirar, 'error')) {
+                        $data = $data + ['id_retiroDocsMinrex' => $retirar->id];
+                    } else {
+                        return response()->json([
+                            'error' => $retirar->error,
+                            'message' => $retirar->message,
+                        ], 500);
+                    }
                 }
                 if ($request->Filled(['id_traduccion', 'fecha_ProcuraT', 'fecha_MatrimonioT'])) {
                     $datos = [
@@ -271,7 +309,15 @@ class flujo1Controller extends Controller
                     $traduccion = $traduccionController->modificar($requestD);
                     $traduccion = json_encode($traduccion->getData());
                     $traduccion = json_decode(($traduccion));
-                    $data = $data + ['id_traduccion' => $traduccion->id];
+
+                    if (!property_exists($traduccion, 'error')) {
+                        $data = $data + ['id_traduccion' => $traduccion->id];
+                    } else {
+                        return response()->json([
+                            'error' => $traduccion->error,
+                            'message' => $traduccion->message,
+                        ], 500);
+                    }
                 }
 
                 DB::commit();
@@ -317,7 +363,6 @@ class flujo1Controller extends Controller
             $flujo->retiroDocs()->delete();
             $flujo->traduccion()->delete();
             return response()->json(new Flujo1Resource($flujo));
-
         } catch (ModelNotFoundException $e) {
             return response()->json([
                 'error' => 'Registro no encontrado',

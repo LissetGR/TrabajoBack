@@ -43,20 +43,20 @@ class llegadaDocs11Controller extends Controller
 
             $validator = $request->validate([
                 'fecha' => 'required|date|date_format:d/m/Y',
-                'doc1' => 'required', 'string',
+                'doc1' => ['required', 'string',
                 function ($attribute, $value, $fail) {
                     $allowedValues = ['Cert. di nascita', 'Procura'];
                     if (!in_array(strtolower($value), array_map('strtolower', $allowedValues))) {
                         $fail($attribute . ' Campo no valido');
                     }
-                },
-                'doc2' => 'required', 'string',
+                }],
+                'doc2' => ['required', 'string',
                 function ($attribute, $value, $fail) {
                     $allowedValues = ['Stato libero', 'Sentenza di divorzio', 'Atto di morte'];
                     if (!in_array(strtolower($value), array_map('strtolower', $allowedValues))) {
                         $fail($attribute . ' Campo no valido');
                     }
-                }
+                }]
             ]);
 
             $llegada = llegada_Doc11::create([
@@ -82,20 +82,20 @@ class llegadaDocs11Controller extends Controller
 
             $validator = $request->validate([
                 'fecha' => 'required|date|date_format:d/m/Y',
-                'doc1' => 'required', 'string',
+                'doc1' => ['required', 'string',
                 function ($attribute, $value, $fail) {
                     $allowedValues = ['Cert. di nascita', 'Procura'];
                     if (!in_array(strtolower($value), array_map('strtolower', $allowedValues))) {
                         $fail($attribute . ' Campo no valido');
                     }
-                },
-                'doc2' => 'required', 'string',
+                }],
+                'doc2' => ['required', 'string',
                 function ($attribute, $value, $fail) {
                     $allowedValues = ['Stato libero', 'Sentenza di divorzio', 'Atto di morte'];
                     if (!in_array(strtolower($value), array_map('strtolower', $allowedValues))) {
                         $fail($attribute . ' Campo no valido');
                     }
-                }
+                }]
             ]);
 
             $llegada = llegada_Doc11::findOrFail($request->input(('id')));

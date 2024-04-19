@@ -41,13 +41,13 @@ class formalizarMatrimonio12Controller extends Controller
             $validator= $request->validate([
                 'fecha'=>'required|date|date_format:d/m/Y',
                 'lugar'=>'required|string|',
-                'tipo'=>'required','string',
+                'tipo'=>['required','string',
                 function ($attribute, $value, $fail) {
                     $allowedValues = ['Divizioni dei beni', 'Comunidad dei beni'];
                     if (!in_array(strtolower($value), array_map('strtolower', $allowedValues))) {
                         $fail($attribute . ' Campo no valido');
                     }
-                },
+                }],
             ]);
 
             $formalizar=formalizar_Matrim12::create([
