@@ -7,6 +7,7 @@ use App\Models\retirar_Doc13;
 use Illuminate\Http\Request;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Validation\ValidationException;
+use App\Rules\CamposPermitidos;
 
 class retirarDocs13Controller extends Controller
 {
@@ -14,6 +15,7 @@ class retirarDocs13Controller extends Controller
     {
         try {
             $validator = $request->validate([
+                '*' => ['sometimes', new CamposPermitidos([ 'id' ])],
                 'id' => 'required|numeric'
             ]);
 
@@ -38,6 +40,7 @@ class retirarDocs13Controller extends Controller
     {
         try {
             $validator = $request->validate([
+                '*' => ['sometimes', new CamposPermitidos([ 'fecha_Procura','fecha_Matrimonio' ])],
                 'fecha_Procura' => 'required|date|date_format:d/m/Y',
                 'fecha_Matrimonio' => 'required|date|date_format:d/m/Y'
             ]);
@@ -62,6 +65,7 @@ class retirarDocs13Controller extends Controller
     {
         try {
             $validator = $request->validate([
+                '*' => ['sometimes', new CamposPermitidos([ 'id','fecha_Procura','fecha_Matrimonio' ])],
                 'fecha_Procura' => 'required|date|date_format:d/m/Y',
                 'fecha_Matrimonio' => 'required|date|date_format:d/m/Y'
             ]);
@@ -92,6 +96,7 @@ class retirarDocs13Controller extends Controller
         try {
 
             $validator = $request->validate([
+                '*' => ['sometimes', new CamposPermitidos([ 'id' ])],
                 'id' => 'required|numeric'
             ]);
 

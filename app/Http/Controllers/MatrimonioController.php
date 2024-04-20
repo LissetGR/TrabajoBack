@@ -17,6 +17,7 @@ use Illuminate\Support\Str;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Validation\ValidationException;
 use Carbon\Carbon;
+use App\Rules\CamposPermitidos;
 use function PHPUnit\Framework\isEmpty;
 
 class MatrimonioController extends Controller
@@ -25,6 +26,7 @@ class MatrimonioController extends Controller
     {
         try {
             $validator = $request->validate([
+                '*' => ['sometimes', new CamposPermitidos(['numero'])],
                 'numero' => 'numeric|required'
             ]);
 
@@ -52,11 +54,11 @@ class MatrimonioController extends Controller
             $hundred_years_ago = (new Carbon("100 years ago"))->year;
 
             $validator = $request->validate([
-                'username' => 'string|alpha_dash',
+                '*' => ['sometimes', new CamposPermitidos(['nombre','numero','tipo','anno','mes','dia'])],
                 'nombre' => 'string',
                 'numero' => 'numeric',
                 'tipo' => [
-                    'required', 'string',
+                     'string',
                     function ($attribute, $value, $fail) {
                         $allowedValues = ['Per procura', 'Congiunto'];
                         if (!in_array(strtolower($value), array_map('strtolower', $allowedValues))) {
@@ -118,6 +120,7 @@ class MatrimonioController extends Controller
     {
         try {
             $validator = $request->validate([
+                '*' => ['sometimes', new CamposPermitidos(['username_cubano','username_italiano','numero','tipo','via_llegada','costo','fecha_llegada'])],
                 'numero' => 'required|numeric|unique:matrimonios',
                 'username_italiano' => 'required|string',
                 'username_cubano' => 'required|string',
@@ -146,9 +149,14 @@ class MatrimonioController extends Controller
 
             $username_italiano = Cliente::has('cliente_italiano')
                 ->where('clientes.username', $validator['username_italiano'])
-                ->first();
+                ->firstOr(function () {
+                    throw new \Exception('Cliente italiano no encontrado');
+                });
 
-            $username_cubano = Cliente::whereRaw('LOWER(username) = ?', [strtolower($validator['username_cubano'])])->first();
+            $username_cubano = Cliente::whereRaw('LOWER(username) = ?', [strtolower($validator['username_cubano'])])
+            ->firstOr(function () {
+                throw new \Exception('Cliente cubano no encontrado');
+            });
 
             $matrimonio = matrimonio::create([
                 'numero' => $validator['numero'],
@@ -179,6 +187,7 @@ class MatrimonioController extends Controller
     {
         try {
             $validator = $request->validate([
+                '*' => ['sometimes', new CamposPermitidos(['username_cubano','username_italiano','numero','tipo','via_llegada','costo','fecha_llegada'])],
                 'numero' => 'required|numeric',
                 'username_italiano' => 'required|string',
                 'username_cubano' => 'required|string',
@@ -206,9 +215,14 @@ class MatrimonioController extends Controller
 
             $username_italiano =  Cliente::join('cliente_italianos', 'clientes.id', '=', 'cliente_italianos.id')
                 ->where('clientes.username', $validator['username_italiano'])
-                ->first();
+                ->firstOr(function () {
+                    throw new \Exception('Cliente italiano no encontrado');
+                });
 
-            $username_cubano = Cliente::whereRaw('LOWER(username) = ?', [strtolower($validator['username_cubano'])])->first();
+            $username_cubano = Cliente::whereRaw('LOWER(username) = ?', [strtolower($validator['username_cubano'])])
+            ->firstOr(function () {
+                throw new \Exception('Cliente cubano no encontrado');
+            });
 
 
 
@@ -241,6 +255,7 @@ class MatrimonioController extends Controller
     {
         try {
             $validator = $request->validate([
+                '*' => ['sometimes', new CamposPermitidos(['numero'])],
                 'numero' => 'numeric|required'
             ]);
 
@@ -409,12 +424,13 @@ class MatrimonioController extends Controller
     {
         try {
             $validator = $request->validate([
+                '*' => ['sometimes', new CamposPermitidos(['numero'])],
                 'id' => 'numeric|required'
             ]);
 
-            $flujo1 = Flujo1::where('id_matrimonio', $validator['id'])->first();
-            $flujo2 = Flujo2::where('id_matrimonio', $validator['id'])->first();
-            $flujo3 = Flujo3::where('id_matrimonio', $validator['id'])->first();
+            $flujo1 = Flujo1::where('id_matrimonio', $validator['numero'])->first();
+            $flujo2 = Flujo2::where('id_matrimonio', $validator['numero'])->first();
+            $flujo3 = Flujo3::where('id_matrimonio', $validator['numero'])->first();
 
             if (isset($flujo1)) {
                 $respuesta = [

@@ -8,12 +8,14 @@ use App\Models\cuotas;
 use App\Models\formaPago;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Validation\ValidationException;
+use App\Rules\CamposPermitidos;
 
 class cuotasController extends Controller
 {
     public function getCuotas(Request $request){
         try{
             $validator=$request->validate([
+                '*' => ['sometimes', new CamposPermitidos(['id'])],
                 'id'=>'required|numeric'
             ]);
             $cuotas= cuotas::where('id_formaPago',$validator['id'])->get();
@@ -50,6 +52,7 @@ class cuotasController extends Controller
     public function create(Request $request){
         try{
             $validator=$request->validate([
+                '*' => ['sometimes', new CamposPermitidos(['id_formaPago','cantidad','fecha'])],
                'id_formaPago'=>'required|numeric',
                'cantidad'=>'required|numeric',
                'fecha'=>'required|date'
@@ -81,6 +84,7 @@ class cuotasController extends Controller
     public function modificar(Request $request){
         try{
             $validator=$request->validate([
+                '*' => ['sometimes', new CamposPermitidos(['id','id_formaPago','cantidad','fecha'])],
                'id_formaPago'=>'required|numeric',
                'cantidad'=>'required|numeric',
                'fecha'=>'required|date'
@@ -118,6 +122,7 @@ class cuotasController extends Controller
     public function destroy(Request $request){
         try{
             $validator=$request->validate([
+                '*' => ['sometimes', new CamposPermitidos(['id'])],
                 'id'=>'required|numeric'
             ]);
 

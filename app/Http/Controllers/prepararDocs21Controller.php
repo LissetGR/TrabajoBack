@@ -8,13 +8,14 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Redis;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Validation\ValidationException;
-
+use App\Rules\CamposPermitidos;
 class prepararDocs21Controller extends Controller
 {
     public function getPreparar(Request $request)
     {
         try {
             $validator = $request->validate([
+                '*' => ['sometimes', new CamposPermitidos(['id' ])],
                 'id' => 'required|numeric'
             ]);
             $preparar = preparar_Doc21::findOrFail($validator['id']);
@@ -38,6 +39,7 @@ class prepararDocs21Controller extends Controller
     {
         try {
             $validator = $request->validate([
+                '*' => ['sometimes', new CamposPermitidos([ 'doc_provItalia21','solicitud_Trans','delegacion','certificado_residencia','doc_idItaliano'])],
                 'doc_provItalia21' => 'required|date|date_format:d/m/Y',
                 'solicitud_Trans' => 'required|boolean',
                 'delegacion' => 'required|boolean',
@@ -62,6 +64,7 @@ class prepararDocs21Controller extends Controller
     {
         try {
             $validator = $request->validate([
+                '*' => ['sometimes', new CamposPermitidos(['id', 'doc_provItalia21','solicitud_Trans','delegacion','certificado_residencia','doc_idItaliano'])],
                 'doc_provItalia21' => 'required|date|date_format:d/m/Y',
                 'solicitud_Trans' => 'required|boolean',
                 'delegacion' => 'required|boolean',
@@ -95,6 +98,7 @@ class prepararDocs21Controller extends Controller
     {
         try {
             $validator = $request->validate([
+                '*' => ['sometimes', new CamposPermitidos(['id'])],
                 'id' => 'required|numeric'
             ]);
 

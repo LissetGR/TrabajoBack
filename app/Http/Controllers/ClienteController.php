@@ -6,10 +6,12 @@ use App\Http\Controllers\Controller;
 use App\Http\Resources\ClienteItalianoResource;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Validator;
 use App\Models\cliente;
 use App\Models\ClienteItaliano;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Validation\ValidationException;
+use App\Rules\CamposPermitidos;
 
 class ClienteController extends Controller
 {
@@ -47,6 +49,7 @@ class ClienteController extends Controller
     {
         try {
             $validator=$request->validate([
+                '*' => ['sometimes', new CamposPermitidos(['id'])],
                 'id'=>'required|numeric'
             ]);
 
@@ -72,11 +75,11 @@ class ClienteController extends Controller
 
     public function busquedaClientes(Request $request){
         try{
-
             $validator=$request->validate([
-                'username' => 'string|alpha_dash',
-                'nombre' => 'string',
-                'id'=>'numeric'
+                '*' => ['sometimes', new CamposPermitidos(['nombre', 'username', 'id'])],
+                'username' => 'sometimes|string|alpha_dash',
+                'nombre' => 'sometimes|string',
+                'id'=>'sometimes|numeric'
             ]);
 
             $clientes=cliente::query()
@@ -116,6 +119,7 @@ class ClienteController extends Controller
     {
         try {
             $validator = $request->validate([
+                '*' => ['sometimes', new CamposPermitidos(['nombre_apellidos', 'username', 'direccion','telefono','email'])],
                 'username' => 'required|string|min:8|max:100|alpha_dash|unique:clientes',
                 'nombre_apellidos' => 'required|string|min:10',
                 'direccion' => 'required|string|min:10',
@@ -149,6 +153,7 @@ class ClienteController extends Controller
     {
         try {
             $validator= $request->validate([
+                '*' => ['sometimes', new CamposPermitidos(['id'])],
                'id'=>'required|numeric'
             ]);
             $cliente = cliente::findOrFail($validator['id']);
@@ -175,6 +180,8 @@ class ClienteController extends Controller
     {
         try {
             $validator = $request->validate([
+                '*' => ['sometimes', new CamposPermitidos(['id','nombre_apellidos', 'username', 'direccion','telefono','email'])],
+                'id'=>'required|numeric',
                 'username' => 'required|string|min:8|max:100|alpha_dash',
                 'nombre_apellidos' => 'required|string|min:10',
                 'direccion' => 'required|string|min:10',

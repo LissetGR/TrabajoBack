@@ -7,6 +7,7 @@ use App\Models\preparar_Docs31;
 use Illuminate\Http\Request;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Validation\ValidationException;
+use App\Rules\CamposPermitidos;
 
 class prepararDocs31Controller extends Controller
 {
@@ -14,6 +15,7 @@ class prepararDocs31Controller extends Controller
     {
         try {
             $validator = $request->validate([
+                '*' => ['sometimes', new CamposPermitidos(['id' ])],
                 'id' => 'required|numeric'
             ]);
 
@@ -38,6 +40,7 @@ class prepararDocs31Controller extends Controller
     {
         try {
             $validator = $request->validate([
+                '*' => ['sometimes', new CamposPermitidos([ 'doc_provItalia31','declaracion_alojamiento', 'reserva_aerea','certificado_residenciaItaliano' ])],
                 'doc_provItalia31' => 'required|date|date_format:d/m/Y',
                 'declaracion_alojamiento' => 'required|boolean',
                 'reserva_aerea' => 'required|boolean',
@@ -61,6 +64,7 @@ class prepararDocs31Controller extends Controller
     {
         try {
             $validator = $request->validate([
+                '*' => ['sometimes', new CamposPermitidos([ 'id','doc_provItalia31','declaracion_alojamiento', 'reserva_aerea','certificado_residenciaItaliano' ])],
                 'doc_provItalia31' => 'required|date|date_format:d/m/Y',
                 'declaracion_alojamiento' => 'required|boolean',
                 'reserva_aerea' => 'required|boolean',
@@ -93,6 +97,7 @@ class prepararDocs31Controller extends Controller
     {
         try {
             $validator = $request->validate([
+                '*' => ['sometimes', new CamposPermitidos(['id' ])],
                 'id' => 'required|numeric'
             ]);
 

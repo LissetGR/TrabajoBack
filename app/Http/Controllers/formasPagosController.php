@@ -8,6 +8,7 @@ use App\Models\Matrimonio;
 use Illuminate\Http\Request;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Validation\ValidationException;
+use App\Rules\CamposPermitidos;
 
 class formasPagosController extends Controller
 {
@@ -16,6 +17,7 @@ class formasPagosController extends Controller
         try {
 
             $validator = $request->validate([
+                '*' => ['sometimes', new CamposPermitidos(['id'])],
                 'id' => 'required|numeric'
             ]);
 
@@ -40,6 +42,7 @@ class formasPagosController extends Controller
     {
         try {
             $validator = $request->validate([
+                '*' => ['sometimes', new CamposPermitidos(['id_matrimonio', 'monto_pago','tipo','fecha'])],
                 'id_matrimonio' => 'required|numeric',
                 'tipo' => 'required', 'string',
                 function ($attribute, $value, $fail) {
@@ -72,6 +75,7 @@ class formasPagosController extends Controller
     {
         try {
             $validator = $request->validate([
+                '*' => ['sometimes', new CamposPermitidos(['id','id_matrimonio', 'monto_pago','tipo','fecha'])],
                 'id_matrimonio' => 'required|numeric',
                 'tipo' => 'required', 'string',
                 function ($attribute, $value, $fail) {
@@ -112,6 +116,7 @@ class formasPagosController extends Controller
         try {
 
             $validator = $request->validate([
+                '*' => ['sometimes', new CamposPermitidos(['id'])],
                 'id' => 'required|numeric'
             ]);
 

@@ -8,6 +8,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Validation\ValidationException;
+use App\Rules\CamposPermitidos;
 
 class llegadaDocs11Controller extends Controller
 {
@@ -16,6 +17,7 @@ class llegadaDocs11Controller extends Controller
         try {
 
             $validator = $request->validate([
+                '*' => ['sometimes', new CamposPermitidos(['id'])],
                 'id' => 'required|numeric'
             ]);
 
@@ -42,6 +44,7 @@ class llegadaDocs11Controller extends Controller
         try {
 
             $validator = $request->validate([
+                '*' => ['sometimes', new CamposPermitidos(['doc1','doc2','fecha'])],
                 'fecha' => 'required|date|date_format:d/m/Y',
                 'doc1' => ['required', 'string',
                 function ($attribute, $value, $fail) {
@@ -81,6 +84,7 @@ class llegadaDocs11Controller extends Controller
         try {
 
             $validator = $request->validate([
+                '*' => ['sometimes', new CamposPermitidos(['id','doc1','doc2','fecha'])],
                 'fecha' => 'required|date|date_format:d/m/Y',
                 'doc1' => ['required', 'string',
                 function ($attribute, $value, $fail) {
@@ -123,6 +127,7 @@ class llegadaDocs11Controller extends Controller
         try {
 
             $validator = $request->validate([
+                '*' => ['sometimes', new CamposPermitidos(['id'])],
                 'id' => 'required|numeric'
             ]);
 

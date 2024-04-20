@@ -7,12 +7,14 @@ use App\Models\formalizar_Matrim12;
 use Illuminate\Http\Request;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Validation\ValidationException;
+use App\Rules\CamposPermitidos;
 
 class formalizarMatrimonio12Controller extends Controller
 {
     public function getFormalizar(Request $request){
         try{
             $validator = $request->validate([
+                '*' => ['sometimes', new CamposPermitidos(['id'])],
                 'id' => 'required|numeric'
             ]);
 
@@ -39,6 +41,7 @@ class formalizarMatrimonio12Controller extends Controller
         try{
 
             $validator= $request->validate([
+                '*' => ['sometimes', new CamposPermitidos(['fecha', 'lugar','tipo'])],
                 'fecha'=>'required|date|date_format:d/m/Y',
                 'lugar'=>'required|string|',
                 'tipo'=>['required','string',
@@ -73,6 +76,7 @@ class formalizarMatrimonio12Controller extends Controller
         try{
 
             $validator= $request->validate([
+                '*' => ['sometimes', new CamposPermitidos(['id','fecha', 'lugar','tipo'])],
                 'fecha'=>'required|date|date_format:d/m/Y',
                 'lugar'=>'required|string|',
                 'tipo'=>'required','string',
@@ -112,6 +116,7 @@ class formalizarMatrimonio12Controller extends Controller
         try{
 
             $validator = $request->validate([
+                '*' => ['sometimes', new CamposPermitidos(['id'])],
                 'id' => 'required|numeric'
             ]);
 

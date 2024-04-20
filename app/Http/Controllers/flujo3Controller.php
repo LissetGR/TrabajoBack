@@ -11,7 +11,7 @@ use App\Models\preparar_Docs31;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Validation\ValidationException;
-
+use App\Rules\CamposPermitidos;
 class flujo3Controller extends Controller
 {
     public function getFlujo3(Request $request)
@@ -19,6 +19,7 @@ class flujo3Controller extends Controller
         try {
 
             $validator = $request->validate([
+                '*' => ['sometimes', new CamposPermitidos(['id'])],
                 'id' => 'required|numeric'
             ]);
 
@@ -164,6 +165,7 @@ class flujo3Controller extends Controller
     {
         try {
             $validator = $request->validate([
+                '*' => ['sometimes', new CamposPermitidos(['id'])],
                 'id' => 'required|numeric'
             ]);
 

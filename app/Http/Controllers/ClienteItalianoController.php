@@ -11,6 +11,7 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Validation\ValidationException;
+use App\Rules\CamposPermitidos;
 
 class ClienteItalianoController extends Controller
 {
@@ -28,6 +29,7 @@ class ClienteItalianoController extends Controller
     {
         try {
             $validator = $request->validate([
+                '*' => ['sometimes', new CamposPermitidos(['id'])],
                 'id' => 'required|numeric'
             ]);
 
@@ -57,6 +59,7 @@ class ClienteItalianoController extends Controller
 
             try {
                 $validator = $request->validate([
+                    '*' => ['sometimes', new CamposPermitidos(['nombre_apellidos', 'username', 'direccion','telefono','email', 'email_registro'])],
                     'username' => 'required|string|min:8|max:100|alpha_dash|unique:clientes',
                     'nombre_apellidos' => 'required|string|min:10',
                     'direccion' => 'required|string|min:10',
@@ -100,6 +103,7 @@ class ClienteItalianoController extends Controller
 
         try {
             $validator = $request->validate([
+                '*' => ['sometimes', new CamposPermitidos(['id','nombre_apellidos', 'username', 'direccion','telefono','email'])],
                 'id' => 'required|numeric',
                 'username' => 'required|string|min:8|max:100|alpha_dash',
                 'nombre_apellidos' => 'required|string|min:10',
