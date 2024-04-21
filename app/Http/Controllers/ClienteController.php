@@ -27,14 +27,16 @@ class ClienteController extends Controller
 
     }
 
-    public function getAllCliente()
+    public function getAllCliente(Request $request)
     {
+        $limit = $request->input('limit', 10);
+
         try{
-            $clientes = Cliente::doesntHave('cliente_italiano')->get();
-            $clienteItaliano = ClienteItaliano::all();
+            $clientes = Cliente::doesntHave('cliente_italiano')->paginate($limit);
+            $clienteItaliano = ClienteItaliano::paginate($limit);
 
             $respuesta = [
-                'clientes cubanos' => $clientes,
+                'clientes cubanos' => $clientes->items(),
                 'clientes italianos' => ClienteItalianoResource::collection($clienteItaliano)
             ];
             return response()->json($respuesta);
@@ -76,7 +78,8 @@ class ClienteController extends Controller
     public function busquedaClientes(Request $request){
         try{
             $validator=$request->validate([
-                '*' => ['sometimes', new CamposPermitidos(['nombre', 'username', 'id'])],
+                '*' => ['sometimes', new CamposPermitidos(['nombre','pasaporte', 'username', 'id'])],
+                'pasaporte' => 'sometimes|string|alpha_dash',
                 'username' => 'sometimes|string|alpha_dash',
                 'nombre' => 'sometimes|string',
                 'id'=>'sometimes|numeric'
@@ -88,6 +91,9 @@ class ClienteController extends Controller
             })
             ->when($request->has('username'), function ($query) use ($validator) {
                 return $query->whereRaw('LOWER(username) LIKE ?', ['%' . strtolower($validator['nombre']) . '%']);
+            })
+            ->when($request->has('pasaporte'), function ($query) use ($validator) {
+                return $query->whereRaw('LOWER(pasaporte) LIKE ?', ['%' . strtolower($validator['pasaporte']) . '%']);
             })
             ->when($request->has('id'), function ($query) use ($validator) {
                 return $query->where('id', $validator['id']);
@@ -119,8 +125,9 @@ class ClienteController extends Controller
     {
         try {
             $validator = $request->validate([
-                '*' => ['sometimes', new CamposPermitidos(['nombre_apellidos', 'username', 'direccion','telefono','email'])],
+                '*' => ['sometimes', new CamposPermitidos(['nombre_apellidos','pasaporte', 'username', 'direccion','telefono','email'])],
                 'username' => 'required|string|min:8|max:100|alpha_dash|unique:clientes',
+                'pasaporte' => 'required|string|min:7|max:7|alpha_dash|unique:clientes',
                 'nombre_apellidos' => 'required|string|min:10',
                 'direccion' => 'required|string|min:10',
                 'telefono' => 'required|numeric|min:8',
@@ -130,6 +137,7 @@ class ClienteController extends Controller
             $cliente = cliente::create([
                 'username' => $validator['username'],
                 'nombre_apellidos' => $validator['nombre_apellidos'],
+                'pasaporte'=>$validator['pasaporte'],
                 'direccion' => $validator['direccion'],
                 'telefono' => $validator['telefono'],
                 'email' => $validator['email']
@@ -180,8 +188,9 @@ class ClienteController extends Controller
     {
         try {
             $validator = $request->validate([
-                '*' => ['sometimes', new CamposPermitidos(['id','nombre_apellidos', 'username', 'direccion','telefono','email'])],
+                '*' => ['sometimes', new CamposPermitidos(['id','pasaporte','nombre_apellidos', 'username', 'direccion','telefono','email'])],
                 'id'=>'required|numeric',
+                'pasaporte' => 'required|string|min:7|max:7|alpha_dash',
                 'username' => 'required|string|min:8|max:100|alpha_dash',
                 'nombre_apellidos' => 'required|string|min:10',
                 'direccion' => 'required|string|min:10',

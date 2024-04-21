@@ -22,6 +22,16 @@ use function PHPUnit\Framework\isEmpty;
 
 class MatrimonioController extends Controller
 {
+    public function getAllMatrimonios(Request $request){
+        $limit = $request->input('limit', 10);
+        try{
+            $matrimonios=Matrimonio::paginate($limit);
+            return response()->json($matrimonios->items());
+        }catch(\Exception $e){
+            return response()->json($e->getMessage());
+        }
+    }
+
     public function getMatrimonio(Request $request)
     {
         try {
@@ -54,7 +64,7 @@ class MatrimonioController extends Controller
             $hundred_years_ago = (new Carbon("100 years ago"))->year;
 
             $validator = $request->validate([
-                '*' => ['sometimes', new CamposPermitidos(['nombre','numero','tipo','anno','mes','dia'])],
+                '*' => ['sometimes', new CamposPermitidos(['nombre','pasaporte','numero','tipo','anno','mes','dia'])],
                 'nombre' => 'string',
                 'numero' => 'numeric',
                 'tipo' => [
@@ -78,6 +88,14 @@ class MatrimonioController extends Controller
                     })
                         ->orWhereHas('usuario_cubano', function ($query) use ($validator) {
                             $query->where(DB::raw('lower(nombre_apellidos)'), 'LIKE', '%' . strtolower($validator['nombre']) . '%');
+                        });
+                })
+                ->when($request->has('pasaporte'), function ($query) use ($validator) {
+                    $query->whereHas('usuario_italiano', function ($query) use ($validator) {
+                        $query->where(DB::raw('lower(pasaporte)'), 'LIKE', '%' . strtolower($validator['pasaporte']) . '%');
+                    })
+                        ->orWhereHas('usuario_cubano', function ($query) use ($validator) {
+                            $query->where(DB::raw('lower(pasaporte)'), 'LIKE', '%' . strtolower($validator['pasaporte']) . '%');
                         });
                 })
                 ->when($request->has('numero'), function ($query) use ($validator) {
@@ -284,15 +302,16 @@ class MatrimonioController extends Controller
             $hundred_years_ago = (new Carbon("100 years ago"))->year;
 
             $validator = $request->validate([
+                '*' => ['sometimes', new CamposPermitidos(['numero', 'pasaporte', 'nombre','mes','anno','dia'])],
                 'nombre' => 'string',
                 'numero' => 'numeric',
-                'forma_pago' => 'string',
-                function ($attribute, $value, $fail) {
-                    $allowedValues = ['Pagato totale', 'Acconto'];
-                    if (!in_array(strtolower($value), array_map('strtolower', $allowedValues))) {
-                        $fail($attribute . ' Campo no valido');
-                    }
-                },
+                // 'forma_pago' => 'string',
+                // function ($attribute, $value, $fail) {
+                //     $allowedValues = ['Pagato totale', 'Acconto'];
+                //     if (!in_array(strtolower($value), array_map('strtolower', $allowedValues))) {
+                //         $fail($attribute . ' Campo no valido');
+                //     }
+                // },
                 'anno' => 'integer|between:' . $hundred_years_ago . ',' . $current_year,
                 'mes' => 'integer|between:1,12',
                 'dia' => 'integer|between:1,31',
@@ -316,6 +335,14 @@ class MatrimonioController extends Controller
                     })
                         ->orWhereHas('usuario_cubano', function ($query) use ($validator) {
                             $query->where(DB::raw('lower(nombre_apellidos)'), 'LIKE', '%' . strtolower($validator['nombre'] . '%'));
+                        });
+                })
+                ->when($request->has('pasaporte'), function ($query) use ($validator) {
+                    return $query->whereHas('usuario_italiano', function ($query) use ($validator) {
+                        $query->where(DB::raw('lower(pasaporte)'), 'LIKE', '%' . strtolower($validator['pasaporte'] . '%'));
+                    })
+                        ->orWhereHas('usuario_cubano', function ($query) use ($validator) {
+                            $query->where(DB::raw('lower(pasaporte)'), 'LIKE', '%' . strtolower($validator['pasaporte'] . '%'));
                         });
                 })
                 ->when($request->has('day'), function ($query) use ($validator) {
@@ -356,15 +383,16 @@ class MatrimonioController extends Controller
             $hundred_years_ago = (new Carbon("100 years ago"))->year;
 
             $validator = $request->validate([
+                '*' => ['sometimes', new CamposPermitidos(['numero', 'pasaporte', 'nombre','mes','anno','dia'])],
                 'nombre' => 'string',
                 'numero' => 'numeric',
-                'forma_pago' => 'string',
-                function ($attribute, $value, $fail) {
-                    $allowedValues = ['Pagato totale', 'Acconto'];
-                    if (!in_array(strtolower($value), array_map('strtolower', $allowedValues))) {
-                        $fail($attribute . ' Campo no valido');
-                    }
-                },
+                // 'forma_pago' => 'string',
+                // function ($attribute, $value, $fail) {
+                //     $allowedValues = ['Pagato totale', 'Acconto'];
+                //     if (!in_array(strtolower($value), array_map('strtolower', $allowedValues))) {
+                //         $fail($attribute . ' Campo no valido');
+                //     }
+                // },
                 'anno' => 'integer|between:' . $hundred_years_ago . ',' . $current_year,
                 'mes' => 'integer|between:1,12',
                 'dia' => 'integer|between:1,31',
@@ -387,6 +415,14 @@ class MatrimonioController extends Controller
                     })
                         ->orWhereHas('usuario_cubano', function ($query) use ($validator) {
                             $query->where(DB::raw('lower(nombre_apellidos)'), 'LIKE', '%' . strtolower($validator['nombre'] . '%'));
+                        });
+                })
+                ->when($request->has('pasaporte'), function ($query) use ($validator) {
+                    return $query->whereHas('usuario_italiano', function ($query) use ($validator) {
+                        $query->where(DB::raw('lower(pasaporte)'), 'LIKE', '%' . strtolower($validator['pasaporte'] . '%'));
+                    })
+                        ->orWhereHas('usuario_cubano', function ($query) use ($validator) {
+                            $query->where(DB::raw('lower(pasaporte)'), 'LIKE', '%' . strtolower($validator['pasaporte'] . '%'));
                         });
                 })
                 ->when($request->has('day'), function ($query) use ($validator) {

@@ -17,6 +17,7 @@ class ClienteItalianoResource extends JsonResource
         return [
             'id'=>$this->cliente->id,
             'username'=>$this->cliente->username,
+            // 'pasaporte'=>$this->cliente->pasaporte,
             'nombre_apellidos'=>$this->cliente->nombre_apellidos,
             'direccion'=>$this->cliente->direccion,
             'telefono'=>$this->cliente->telefono,

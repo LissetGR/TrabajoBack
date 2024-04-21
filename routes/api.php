@@ -73,6 +73,7 @@ Route::middleware('auth:sanctum')->group( function () {
     Route::put('modificarMatrimonio',[MatrimonioController::class, 'modificar']);
     Route::get('getPagos',[MatrimonioController::class, 'getPagos']);
     Route::get('getNoPagos',[MatrimonioController::class, 'getNoPagos']);
+    Route::get('getAllMatrimonios',[MatrimonioController::class, 'getAllMatrimonios']);
     Route::get('getAllFlujos',[MatrimonioController::class, 'getAllFlujos']);
 
     // formas de pago
