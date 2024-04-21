@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\ClienteItalianoResource;
 use App\Models\ClienteItaliano;
+use App\Models\User;
 use Illuminate\Http\Request;
 use App\Models\cliente;
 use Illuminate\Support\Facades\Log;
@@ -61,6 +62,7 @@ class ClienteItalianoController extends Controller
                 $validator = $request->validate([
                     '*' => ['sometimes', new CamposPermitidos(['nombre_apellidos', 'username', 'direccion','telefono','email', 'email_registro'])],
                     'username' => 'required|string|min:8|max:100|alpha_dash|unique:clientes',
+                    'pasaporte' => 'required|string|min:7|max:7|alpha_dash|unique:clientes',
                     'nombre_apellidos' => 'required|string|min:10',
                     'direccion' => 'required|string|min:10',
                     'telefono' => 'required|numeric|min:8',
@@ -68,8 +70,18 @@ class ClienteItalianoController extends Controller
                     'email_registro' => 'required|email',
                 ]);
 
+                $userExists = User::where('name', $request->input('username'))->exists();
+                if (!$userExists) {
+                    return response()->json([
+                        'error' => 'Usuario no encontrado',
+                        'message' => 'No se pudo encontrar el usuario con el username proporcionado',
+                    ], 404);
+                }
+
+
                 $cliente = cliente::create([
                     'username' => $validator['username'],
+                    'pasaporte'=>$validator['pasaporte'],
                     'nombre_apellidos' => $validator['nombre_apellidos'],
                     'direccion' => $validator['direccion'],
                     'telefono' => $validator['telefono'],

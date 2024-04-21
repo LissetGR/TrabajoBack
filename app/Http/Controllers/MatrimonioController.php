@@ -168,12 +168,18 @@ class MatrimonioController extends Controller
             $username_italiano = Cliente::has('cliente_italiano')
                 ->where('clientes.username', $validator['username_italiano'])
                 ->firstOr(function () {
-                    throw new \Exception('Cliente italiano no encontrado');
+                    return response()->json([
+                        'error' => 'Usuario no encontrado',
+                        'message' => 'No se pudo encontrar el cliente italiano con el username proporcionado',
+                    ], 404);
                 });
 
             $username_cubano = Cliente::whereRaw('LOWER(username) = ?', [strtolower($validator['username_cubano'])])
             ->firstOr(function () {
-                throw new \Exception('Cliente cubano no encontrado');
+                return response()->json([
+                    'error' => 'Usuario no encontrado',
+                    'message' => 'No se pudo encontrar el cliente cubano con el username proporcionado',
+                ], 404);
             });
 
             $matrimonio = matrimonio::create([

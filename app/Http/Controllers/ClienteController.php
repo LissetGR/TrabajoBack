@@ -4,14 +4,15 @@ namespace App\Http\Controllers;
 
 use App\Http\Controllers\Controller;
 use App\Http\Resources\ClienteItalianoResource;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 use App\Models\cliente;
 use App\Models\ClienteItaliano;
-use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Validation\ValidationException;
 use App\Rules\CamposPermitidos;
+use App\Models\User;
 
 class ClienteController extends Controller
 {
@@ -124,6 +125,7 @@ class ClienteController extends Controller
     public function create(Request $request)
     {
         try {
+
             $validator = $request->validate([
                 '*' => ['sometimes', new CamposPermitidos(['nombre_apellidos','pasaporte', 'username', 'direccion','telefono','email'])],
                 'username' => 'required|string|min:8|max:100|alpha_dash|unique:clientes',
@@ -133,6 +135,14 @@ class ClienteController extends Controller
                 'telefono' => 'required|numeric|min:8',
                 'email' => 'required|email'
             ]);
+
+            $userExists = User::where('name', $request->input('username'))->exists();
+            if (!$userExists) {
+                return response()->json([
+                    'error' => 'Usuario no encontrado',
+                    'message' => 'No se pudo encontrar el usuario con el username proporcionado',
+                ], 404);
+            }
 
             $cliente = cliente::create([
                 'username' => $validator['username'],
