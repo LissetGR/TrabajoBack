@@ -57,6 +57,7 @@ class flujo1Controller extends Controller
             DB::beginTransaction();
             try {
                 $validator = $request->validate([
+                    '*' => ['sometimes', new CamposPermitidos([ 'observaciones','cm_minrex','tercer_Email','retirada_CM','procura_minrex','segundo_Email', 'id_matrimonio','primer_Email','email_Cubano','fecha_ProcuraT', 'fecha_MatrimonioT', 'cuarto_Email','doc1', 'doc2', 'fecha_llegada','tipo', 'lugar', 'fecha_formalizar', 'coordinar_Matrim','fecha_ProcuraRetirar', 'fecha_MatrimonioRetirar'])],
                     'id_matrimonio' => 'required|unique:flujo1s|numeric',
                     'primer_Email' => 'nullable|date|date_format:d/m/Y',
                     'email_Cubano' => 'nullable|date|date_format:d/m/Y',
@@ -214,7 +215,9 @@ class flujo1Controller extends Controller
             DB::beginTransaction();
             try {
                 $validator = $request->validate([
+                    '*' => ['sometimes', new CamposPermitidos(['id_traduccion','id_retirar','id_formalizar','id_llegada', 'observaciones','cm_minrex','tercer_Email','retirada_CM','procura_minrex','segundo_Email', 'id_matrimonio','primer_Email','email_Cubano','fecha_ProcuraT', 'fecha_MatrimonioT', 'cuarto_Email','doc1', 'doc2', 'fecha_llegada','tipo', 'lugar', 'fecha_formalizar', 'coordinar_Matrim','fecha_ProcuraRetirar', 'fecha_MatrimonioRetirar'])],
                     'id_matrimonio' => 'required|numeric',
+                    'id_flujo' => 'required|numeric',
                     'primer_Email' => 'nullable|date|date_format:d/m/Y',
                     'email_Cubano' => 'nullable|date|date_format:d/m/Y',
                     'coordinar_Matrim' => 'nullable|date|date_format:d/m/Y',

@@ -50,6 +50,7 @@ class flujo2Controller extends Controller
             DB::beginTransaction();
             try {
                 $validator = $request->validate([
+                    '*' => ['sometimes', new CamposPermitidos(['doc_provItalia21','solicitud_Trans','delegacion','certificado_residencia','doc_idItaliano','id_matrimonio','cita_trans','quinto_Email','transc_embajada','sexto_Email','fecha_solicVisa','observaciones'])],
                     'id_matrimonio' => 'required|unique:flujo2s|numeric',
                     'cita_trans' => 'nullable|date|date_format:d/m/Y',
                     'quinto_Email' => 'nullable|date|date_format:d/m/Y',
@@ -111,6 +112,8 @@ class flujo2Controller extends Controller
             DB::beginTransaction();
             try {
                 $validator = $request->validate([
+                    '*' => ['sometimes', new CamposPermitidos(['id_flujo', 'id','doc_provItalia21','solicitud_Trans','delegacion','certificado_residencia','doc_idItaliano','id_matrimonio','cita_trans','quinto_Email','transc_embajada','sexto_Email','fecha_solicVisa','observaciones'])],
+                    'id_flujo' => 'required|numeric',
                     'id_matrimonio' => 'required|numeric',
                     'cita_trans' => 'nullable|date|date_format:d/m/Y',
                     'quinto_Email' => 'nullable|date|date_format:d/m/Y',

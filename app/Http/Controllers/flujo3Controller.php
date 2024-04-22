@@ -49,6 +49,7 @@ class flujo3Controller extends Controller
             DB::beginTransaction();
             try {
                 $validator = $request->validate([
+                    '*' => ['sometimes', new CamposPermitidos([ 'observaciones','id_matrimonio','ultimo_Email', 'retiro_passport','solicitud_visado',  'cita_cubano' ,'doc_provItalia31','declaracion_alojamiento', 'reserva_aerea','certificado_residenciaItaliano' ])],
                     'id_matrimonio' => 'required|unique:flujo3s|numeric',
                     'cita_cubano' => 'nullable|date|date_format:d/m/Y',
                     'solicitud_visado' => 'nullable|date|date_format:d/m/Y',
@@ -107,6 +108,8 @@ class flujo3Controller extends Controller
             DB::beginTransaction();
             try {
                 $validator = $request->validate([
+                    '*' => ['sometimes', new CamposPermitidos([ 'id','observaciones','id_matrimonio','ultimo_Email', 'retiro_passport','solicitud_visado',  'cita_cubano' ,'doc_provItalia31','declaracion_alojamiento', 'reserva_aerea','certificado_residenciaItaliano' ])],
+                    'id_flujo' => 'required|numeric',
                     'id_matrimonio' => 'required|numeric',
                     'cita_cubano' => 'nullable|date|date_format:d/m/Y',
                     'solicitud_visado' => 'nullable|date|date_format:d/m/Y',
