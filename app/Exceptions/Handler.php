@@ -3,6 +3,8 @@
 namespace App\Exceptions;
 
 use Illuminate\Foundation\Exceptions\Handler as ExceptionHandler;
+use Illuminate\Http\Exceptions\ThrottleRequestsException;
+
 use Throwable;
 
 class Handler extends ExceptionHandler
@@ -23,8 +25,10 @@ class Handler extends ExceptionHandler
      */
     public function register(): void
     {
-        $this->reportable(function (Throwable $e) {
-            //
+        $this->renderable(function (ThrottleRequestsException $e, $request) {
+            return response()->json([
+                'message' => 'Demasiados intentos de inicio de sesión. Por favor, inténtalo de nuevo más tarde.'
+            ], 429);
         });
-    }
+        }
 }

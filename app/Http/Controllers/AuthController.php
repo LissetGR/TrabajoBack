@@ -16,6 +16,11 @@ use function PHPUnit\Framework\throwException;
 
 class AuthController extends Controller
 {
+    public function __construct()
+    {
+        $this->middleware('throttle:5,1')->only('login');
+    }
+
     public function register(Request $request)
     {
         try {
