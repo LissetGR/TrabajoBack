@@ -38,8 +38,8 @@ class ClienteItalianoController extends Controller
             return response()->json(new ClienteItalianoResource($cliente));
         } catch (ModelNotFoundException $e) {
             return response()->json([
-                'error' => 'Usuario no encontrado',
-                'message' => 'No se pudo encontrar el usuario con el ID proporcionado'+ $e->getMessage(),
+                'error' => 'Cliente italiano no encontrado',
+                'message' => 'No se pudo encontrar el cliente italiano con el ID proporcionado',
             ], 404);
         } catch (ValidationException $e) {
             return response()->json([
@@ -102,7 +102,7 @@ class ClienteItalianoController extends Controller
             };
         } catch (ValidationException $e) {
             return response()->json([
-                'error' => 'Error de validación',
+                'error' => 'Error de validación en los datos proporcionados para el cliente italiano',
                 'message' => $e->errors(),
             ], 422);
         } catch (\Exception $e) {
@@ -136,12 +136,12 @@ class ClienteItalianoController extends Controller
             return response()->json(new ClienteItalianoResource($cliente_italiano));
         } catch (ModelNotFoundException $e) {
             return response()->json([
-                'error' => 'Usuario no encontrado',
-                'message' => 'No se pudo encontrar el usuario con el ID proporcionado'+ $e->getMessage(),
+                'error' => 'Registro del cliente no encontrado',
+                'message' => 'No se pudo encontrar el Registro del cliente con el ID proporcionado',
             ], 404);
         } catch (ValidationException $e) {
             return response()->json([
-                'error' => 'Error de validación',
+                'error' => 'Error de validación en los datos a modificar el cliente italiano',
                 'message' => $e->errors(),
             ], 422);
         } catch (\Exception $e) {

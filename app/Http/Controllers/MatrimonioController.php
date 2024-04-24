@@ -49,7 +49,7 @@ class MatrimonioController extends Controller
             ], 404);
         } catch (ValidationException $e) {
             return response()->json([
-                'error' => 'Error de validación',
+                'error' => 'Error de validación con los datos para obtener el matrimonio',
                 'message' => $e->errors(),
             ], 422);
         } catch (\Exception $e) {
@@ -125,7 +125,7 @@ class MatrimonioController extends Controller
             }
         } catch (ValidationException $e) {
             return response()->json([
-                'error' => 'Error de validación',
+                'error' => 'Error de validación con los datos proporcionados para la busqueda',
                 'message' => $e->errors(),
             ], 422);
         } catch (\Exception $error) {
@@ -168,18 +168,12 @@ class MatrimonioController extends Controller
             $username_italiano = Cliente::has('cliente_italiano')
                 ->where('clientes.username', $validator['username_italiano'])
                 ->firstOr(function () {
-                    return response()->json([
-                        'error' => 'Usuario no encontrado',
-                        'message' => 'No se pudo encontrar el cliente italiano con el username proporcionado',
-                    ], 404);
+                   throw new \Exception('No se pudo encontrar el cliente italiano con el username proporcionado');
                 });
 
             $username_cubano = Cliente::whereRaw('LOWER(username) = ?', [strtolower($validator['username_cubano'])])
             ->firstOr(function () {
-                return response()->json([
-                    'error' => 'Usuario no encontrado',
-                    'message' => 'No se pudo encontrar el cliente cubano con el username proporcionado',
-                ], 404);
+                throw new \Exception('No se pudo encontrar el cliente cubano con el username proporcionado');
             });
 
             $matrimonio = matrimonio::create([
@@ -199,7 +193,7 @@ class MatrimonioController extends Controller
             return response()->json(new MatrimonioResource($matrimonio));
         } catch (ValidationException $e) {
             return response()->json([
-                'error' => 'Error de validación',
+                'error' => 'Error de validación con los datos proporcionados para crear el registro matrimonio',
                 'message' => $e->errors(),
             ], 422);
         } catch (\Exception $e) {
@@ -267,7 +261,7 @@ class MatrimonioController extends Controller
             ], 404);
         } catch (ValidationException $e) {
             return response()->json([
-                'error' => 'Error de validación',
+                'error' => 'Error de validación de los datos para modificar el registro matrimonio',
                 'message' => $e->errors(),
             ], 422);
         } catch (\Exception $e) {
@@ -293,7 +287,7 @@ class MatrimonioController extends Controller
             ], 404);
         } catch (ValidationException $e) {
             return response()->json([
-                'error' => 'Error de validación',
+                'error' => 'Error de validación con los datos proporcionados para eliminar el matrimonio',
                 'message' => $e->errors(),
             ], 422);
         } catch (\Exception $e) {
@@ -311,13 +305,6 @@ class MatrimonioController extends Controller
                 '*' => ['sometimes', new CamposPermitidos(['numero', 'pasaporte', 'nombre','mes','anno','dia'])],
                 'nombre' => 'string',
                 'numero' => 'numeric',
-                // 'forma_pago' => 'string',
-                // function ($attribute, $value, $fail) {
-                //     $allowedValues = ['Pagato totale', 'Acconto'];
-                //     if (!in_array(strtolower($value), array_map('strtolower', $allowedValues))) {
-                //         $fail($attribute . ' Campo no valido');
-                //     }
-                // },
                 'anno' => 'integer|between:' . $hundred_years_ago . ',' . $current_year,
                 'mes' => 'integer|between:1,12',
                 'dia' => 'integer|between:1,31',
@@ -373,7 +360,7 @@ class MatrimonioController extends Controller
             }
         } catch (ValidationException $e) {
             return response()->json([
-                'error' => 'Error de validación',
+                'error' => 'Error de validación con los datos proporcionados para la busqueda',
                 'message' => $e->errors(),
             ], 422);
         } catch (\Exception $error) {
@@ -392,13 +379,6 @@ class MatrimonioController extends Controller
                 '*' => ['sometimes', new CamposPermitidos(['numero', 'pasaporte', 'nombre','mes','anno','dia'])],
                 'nombre' => 'string',
                 'numero' => 'numeric',
-                // 'forma_pago' => 'string',
-                // function ($attribute, $value, $fail) {
-                //     $allowedValues = ['Pagato totale', 'Acconto'];
-                //     if (!in_array(strtolower($value), array_map('strtolower', $allowedValues))) {
-                //         $fail($attribute . ' Campo no valido');
-                //     }
-                // },
                 'anno' => 'integer|between:' . $hundred_years_ago . ',' . $current_year,
                 'mes' => 'integer|between:1,12',
                 'dia' => 'integer|between:1,31',
@@ -453,7 +433,7 @@ class MatrimonioController extends Controller
             }
         } catch (ValidationException $e) {
             return response()->json([
-                'error' => 'Error de validación',
+                'error' => 'Error de validación con los datos proporcionados para la busqueda',
                 'message' => $e->errors(),
             ], 422);
         } catch (\Exception $error) {
@@ -497,7 +477,7 @@ class MatrimonioController extends Controller
             ], 404);
         } catch (ValidationException $e) {
             return response()->json([
-                'error' => 'Error de validación',
+                'error' => 'Error de validación con los datos proporcionados para obtener los datos de los flujos',
                 'message' => $e->errors(),
             ], 422);
         } catch (\Exception $e) {

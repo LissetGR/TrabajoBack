@@ -28,7 +28,7 @@ class observacionesController extends Controller
             ], 404);
         } catch (ValidationException $e) {
             return response()->json([
-                'error' => 'Error de validación',
+                'error' => 'Error de validación con los datos para obtener el registro de la tabla observaciones',
                 'message' => $e->errors(),
             ], 422);
         } catch (\Exception $e) {
@@ -54,7 +54,7 @@ class observacionesController extends Controller
             return response()->json($observaciones);
         } catch (ValidationException $e) {
             return response()->json([
-                'error' => 'Error de validación',
+                'error' => 'Error de validación con los datos para crear el registro de la tabla observaciones',
                 'message' => $e->errors(),
             ], 422);
         } catch (\Exception $e) {
@@ -86,7 +86,7 @@ class observacionesController extends Controller
             ], 404);
         } catch (ValidationException $e) {
             return response()->json([
-                'error' => 'Error de validación',
+                'error' => 'Error de validación con los datos para modificar el registro de la tabla observaciones',
                 'message' => $e->errors(),
             ], 422);
         } catch (\Exception $e) {
@@ -113,7 +113,7 @@ class observacionesController extends Controller
             ], 404);
         } catch (ValidationException $e) {
             return response()->json([
-                'error' => 'Error de validación',
+                'error' => 'Error de validación de los datos para eliminar el registro de la table observaciones',
                 'message' => $e->errors(),
             ], 422);
         } catch (\Exception $e) {

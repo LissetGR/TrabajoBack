@@ -20,10 +20,10 @@ class flujo3Controller extends Controller
 
             $validator = $request->validate([
                 '*' => ['sometimes', new CamposPermitidos(['id'])],
-                'id' => 'required|numeric'
+                'numero' => 'required|numeric'
             ]);
 
-            $flujo = Flujo3::where('id_matrimonio', $validator['id'])->get();
+            $flujo = Flujo3::where('id_matrimonio', $validator['numero'])->get();
             return response()->json(Flujo3Resource::collection($flujo));
         } catch (ModelNotFoundException $e) {
             return response()->json([
@@ -32,7 +32,7 @@ class flujo3Controller extends Controller
             ], 404);
         } catch (ValidationException $e) {
             return response()->json([
-                'error' => 'Error de validación',
+                'error' =>  'Error de validación de los datos para visualizar su registro del flujo ',
                 'message' => $e->errors(),
             ], 422);
         } catch (\Exception $e) {
@@ -49,7 +49,7 @@ class flujo3Controller extends Controller
             DB::beginTransaction();
             try {
                 $validator = $request->validate([
-                    '*' => ['sometimes', new CamposPermitidos([ 'observaciones','id_matrimonio','ultimo_Email', 'retiro_passport','solicitud_visado',  'cita_cubano' ,'doc_provItalia31','declaracion_alojamiento', 'reserva_aerea','certificado_residenciaItaliano' ])],
+                    '*' => ['sometimes', new CamposPermitidos(['id_prepararDocs', 'observaciones','id_matrimonio','ultimo_Email', 'retiro_passport','solicitud_visado',  'cita_cubano' ])],
                     'id_matrimonio' => 'required|unique:flujo3s|numeric',
                     'cita_cubano' => 'nullable|date|date_format:d/m/Y',
                     'solicitud_visado' => 'nullable|date|date_format:d/m/Y',
@@ -58,20 +58,26 @@ class flujo3Controller extends Controller
                     'observaciones' => 'nullable|string',
                 ]);
 
-                $preparar = $prepararDocs->create($request);
-                $preparar = json_encode($preparar->getData());
-                $preparar = json_decode(($preparar));
+                if ($request->input('id_prepararDocs')) {
+                    $datos = $request->input('id_prepararDocs');
+                    $requestD = new \Illuminate\Http\Request();
+                    $requestD->replace($datos);
 
-                if (!property_exists($preparar, 'error')) {
-                    $data = $validator + ['id_prepararDocs' => $preparar->id];
-                } else {
-                    return response()->json([
-                        'error' => $preparar->error,
-                        'message' => $preparar->message,
-                    ], 500);
+                    $preparar = $prepararDocs->create($requestD);
+                    $preparar = json_encode($preparar->getData());
+                    $preparar = json_decode(($preparar));
+
+                    if (!property_exists($preparar , 'error')) {
+                        $validator['id_prepararDocs'] = $preparar->id;
+                    } else {
+                        return response()->json([
+                            'error' => $preparar->error,
+                            'message' => $preparar->message,
+                        ], 500);
+                    }
                 }
 
-                $flujo3 = Flujo3::create($data);
+                $flujo3 = Flujo3::create($validator);
 
                 DB::commit();
 
@@ -86,7 +92,7 @@ class flujo3Controller extends Controller
             };
         } catch (ValidationException $e) {
             return response()->json([
-                'error' => 'Error de validación',
+                'error' => 'Error de validación de los datos para crear el flujo',
                 'message' => $e->errors(),
             ], 422);
         } catch (ModelNotFoundException $e) {
@@ -108,8 +114,8 @@ class flujo3Controller extends Controller
             DB::beginTransaction();
             try {
                 $validator = $request->validate([
-                    '*' => ['sometimes', new CamposPermitidos([ 'id','observaciones','id_matrimonio','ultimo_Email', 'retiro_passport','solicitud_visado',  'cita_cubano' ,'doc_provItalia31','declaracion_alojamiento', 'reserva_aerea','certificado_residenciaItaliano' ])],
-                    'id_flujo' => 'required|numeric',
+                    '*' => ['sometimes', new CamposPermitidos([ 'id','id_prepararDocs','observaciones','id_matrimonio','ultimo_Email', 'retiro_passport','solicitud_visado',  'cita_cubano' ])],
+                    'id' => 'required|numeric',
                     'id_matrimonio' => 'required|numeric',
                     'cita_cubano' => 'nullable|date|date_format:d/m/Y',
                     'solicitud_visado' => 'nullable|date|date_format:d/m/Y',
@@ -118,17 +124,25 @@ class flujo3Controller extends Controller
                     'observaciones' => 'nullable|string',
                 ]);
 
-                $flujo3 = Flujo3::findOrFail($request->input('id_flujo'));
+                $flujo3 = Flujo3::findOrFail($request->input('id'));
 
 
-                if ($request->anyFilled(['doc_provItalia31', 'declaracion_alojamiento', 'reserva_aerea', 'certificado_residenciaItaliano'])) {
-                    $preparar = $prepararDocs->create($request);
+                if ($request->input('id_prepararDocs')) {
+                    $datos = $request->input('id_prepararDocs');
+                    $requestD = new \Illuminate\Http\Request();
+                    $requestD->replace($datos);
+
+                    if ($request->has('id_prepararDocs.id')) {
+                        $preparar = $prepararDocs->modificar($requestD);
+                    } else {
+                        $preparar = $prepararDocs->create($requestD);
+                    }
+
                     $preparar = json_encode($preparar->getData());
                     $preparar = json_decode(($preparar));
 
-                    if (!property_exists($preparar, 'error')) {
-                        $validator = $validator + ['id_prepararDocs' => $preparar->id];
-                        $flujo3->preparacionDocumentos()->associate($preparar);
+                    if (!property_exists($preparar , 'error')) {
+                        $validator['id_prepararDocs'] = $preparar->id;
                     } else {
                         return response()->json([
                             'error' => $preparar->error,
@@ -156,7 +170,7 @@ class flujo3Controller extends Controller
             ], 404);
         } catch (ValidationException $e) {
             return response()->json([
-                'error' => 'Error de validación',
+                'error' => 'Error de validación de los datos para modificar el flujo',
                 'message' => $e->errors(),
             ], 422);
         } catch (\Exception $e) {
@@ -169,10 +183,10 @@ class flujo3Controller extends Controller
         try {
             $validator = $request->validate([
                 '*' => ['sometimes', new CamposPermitidos(['id'])],
-                'id' => 'required|numeric'
+                'numero' => 'required|numeric'
             ]);
 
-            $flujo = Flujo3::with('preparacionDocumentos')->findOrFail($validator['id']);
+            $flujo = Flujo3::with('preparacionDocumentos')->where('id_matrimonio', $validator['numero'])->first();
             $flujo->delete();
             $flujo->preparacionDocumentos()->delete();
 
@@ -184,7 +198,7 @@ class flujo3Controller extends Controller
             ], 404);
         } catch (ValidationException $e) {
             return response()->json([
-                'error' => 'Error de validación',
+                'error' => 'Error de validación de los datos para eliminar el flujo',
                 'message' => $e->errors(),
             ], 422);
         } catch (\Exception $e) {

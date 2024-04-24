@@ -29,7 +29,7 @@ class cuotasController extends Controller
         }
         catch (ValidationException $e) {
             return response()->json([
-                'error' => 'Error de validación',
+                'error' => 'Error de validación de los datos para crear una cuota',
                 'message' => $e->errors(),
             ], 422);
         }
@@ -72,7 +72,7 @@ class cuotasController extends Controller
 
         }catch (ValidationException $e) {
             return response()->json([
-                'error' => 'Error de validación',
+                'error' => 'Error de validación de los datos para crear una cuota',
                 'message' => $e->errors(),
             ], 422);
         } catch (\Exception $e) {
@@ -110,7 +110,7 @@ class cuotasController extends Controller
         }
         catch (ValidationException $e) {
             return response()->json([
-                'error' => 'Error de validación',
+                'error' => 'Error de validación de los datos para modificar una cuota',
                 'message' => $e->errors(),
             ], 422);
         }
@@ -139,7 +139,7 @@ class cuotasController extends Controller
         }
         catch (ValidationException $e) {
             return response()->json([
-                'error' => 'Error de validación',
+                'error' => 'Error de validación de los datos proporcionados para eliminar la cuota',
                 'message' => $e->errors(),
             ], 422);
         }

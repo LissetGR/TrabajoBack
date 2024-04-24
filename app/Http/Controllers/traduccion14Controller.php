@@ -27,7 +27,7 @@ class traduccion14Controller extends Controller
             ], 404);
         } catch (ValidationException $e) {
             return response()->json([
-                'error' => 'Error de validación',
+                'error' => 'Error de validación de los datos para obtener el registro de la tabla traduccion',
                 'message' => $e->errors(),
             ], 422);
         } catch (\Exception $e) {
@@ -53,7 +53,7 @@ class traduccion14Controller extends Controller
             return response()->json($traduccion);
         } catch (ValidationException $e) {
             return response()->json([
-                'error' => 'Error de validación',
+                'error' => 'Error de validación de los datos para crear el registro de la tabla traduccion',
                 'message' => $e->errors(),
             ], 422);
         } catch (\Exception $e) {
@@ -66,7 +66,7 @@ class traduccion14Controller extends Controller
 
         try {
             $validator = $request->validate([
-                '*' => ['sometimes', new CamposPermitidos([ 'id','fecha_Procura','fecha_Matrimonio' ])],
+                '*' => ['sometimes', new CamposPermitidos(['created_at', 'updated_at', 'id','fecha_Procura','fecha_Matrimonio' ])],
                 'fecha_Procura' => 'required|date|date_format:d/m/Y',
                 'fecha_Matrimonio' => 'required|date|date_format:d/m/Y'
             ]);
@@ -82,7 +82,7 @@ class traduccion14Controller extends Controller
             ], 404);
         } catch (ValidationException $e) {
             return response()->json([
-                'error' => 'Error de validación',
+                'error' => 'Error de validación de los datos para modificar el registro de la tabla traduccion',
                 'message' => $e->errors(),
             ], 422);
         } catch (\Exception $e) {
@@ -110,7 +110,7 @@ class traduccion14Controller extends Controller
             ], 404);
         } catch (ValidationException $e) {
             return response()->json([
-                'error' => 'Error de validación',
+                'error' => 'Error de validación de los datos para eliminar el registro de la tabla traduccion',
                 'message' => $e->errors(),
             ], 422);
         } catch (\Exception $e) {

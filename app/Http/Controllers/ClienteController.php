@@ -61,13 +61,13 @@ class ClienteController extends Controller
         }
         catch (ModelNotFoundException $e) {
             return response()->json([
-                'error' => 'Usuario no encontrado',
-                'message' => 'No se pudo encontrar el usuario con el ID proporcionado',
+                'error' => 'Registro no encontrado',
+                'message' => 'No se pudo encontrar el registro con el ID proporcionado',
             ], 404);
         }
         catch (ValidationException $e) {
             return response()->json([
-                'error' => 'Error de validación',
+                'error' => 'Error de validación en los datos de la busqueda',
                 'message' => $e->errors(),
             ], 422);
         }
@@ -113,7 +113,7 @@ class ClienteController extends Controller
         }
         catch (ValidationException $e) {
             return response()->json([
-                'error' => 'Error de validación',
+                'error' => 'Error de validación en los datos de la busqueda',
                 'message' => $e->errors(),
             ], 422);
         }
@@ -139,8 +139,8 @@ class ClienteController extends Controller
             $userExists = User::where('name', $request->input('username'))->exists();
             if (!$userExists) {
                 return response()->json([
-                    'error' => 'Usuario no encontrado',
-                    'message' => 'No se pudo encontrar el usuario con el username proporcionado',
+                    'error' => 'Registro de usuario no encontrado',
+                    'message' => 'No se pudo encontrar el registro con el username proporcionado',
                 ], 404);
             }
 
@@ -159,7 +159,7 @@ class ClienteController extends Controller
 
         } catch (ValidationException $e) {
             return response()->json([
-                'error' => 'Error de validación',
+                'error' =>'Error de validación en los datos del cliente cubano',
                 'message' => $e->errors(),
             ], 422);
         } catch (\Exception $e) {
@@ -179,13 +179,13 @@ class ClienteController extends Controller
             return response()->json($cliente);
         }catch (ModelNotFoundException $e) {
             return response()->json([
-                'error' => 'Usuario no encontrado',
-                'message' => 'No se pudo encontrar el usuario con el ID proporcionado',
+                'error' => 'Registro del cliente cubano no encontrado',
+                'message' => 'No se pudo encontrar el registro con el ID proporcionado',
             ], 404);
         }
         catch (ValidationException $e) {
             return response()->json([
-                'error' => 'Error de validación',
+                'error' => 'Error de validación en los datos proporcionados para eliminar el cliente cubano',
                 'message' => $e->errors(),
             ], 422);
         }
@@ -214,13 +214,13 @@ class ClienteController extends Controller
         }
         catch (ModelNotFoundException $e) {
             return response()->json([
-                'error' => 'Usuario no encontrado',
-                'message' => 'No se pudo encontrar el usuario con el ID proporcionado',
+                'error' => 'Registro de cliente cubano no encontrado',
+                'message' => 'No se pudo encontrar el registro con el ID proporcionado',
             ], 404);
         }
         catch (ValidationException $e) {
             return response()->json([
-                'error' => 'Error de validación',
+                'error' => 'Error de validación en los datos del cliente cubano',
                 'message' => $e->errors(),
             ], 422);
         }

@@ -27,7 +27,7 @@ class prepararDocs21Controller extends Controller
             ], 404);
         } catch (ValidationException $e) {
             return response()->json([
-                'error' => 'Error de validación',
+                'error' => 'Error de validación con los datos proporcionados para obtener el registro de la tabla preparar documentos',
                 'message' => $e->errors(),
             ], 422);
         } catch (\Exception $e) {
@@ -52,7 +52,7 @@ class prepararDocs21Controller extends Controller
             return response()->json($preparar);
         } catch (ValidationException $e) {
             return response()->json([
-                'error' => 'Error de validación',
+                'error' => 'Error de validación con los datos para crear un registro en la tabla preparar documentos',
                 'message' => $e->errors(),
             ], 422);
         } catch (\Exception $e) {
@@ -85,7 +85,7 @@ class prepararDocs21Controller extends Controller
             ], 404);
         } catch (ValidationException $e) {
             return response()->json([
-                'error' => 'Error de validación',
+                'error' => 'Error de validación con los datos para modificar un registro en la tabla preparar documentos',
                 'message' => $e->errors(),
             ], 422);
         } catch (\Exception $e) {
@@ -114,7 +114,7 @@ class prepararDocs21Controller extends Controller
             ], 404);
         } catch (ValidationException $e) {
             return response()->json([
-                'error' => 'Error de validación',
+                'error' => 'Error de validación con los datos para eliminar un registro en la tabla preparar documentos',
                 'message' => $e->errors(),
             ], 422);
         } catch (\Exception $e) {

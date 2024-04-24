@@ -30,7 +30,7 @@ class formasPagosController extends Controller
             ], 404);
         } catch (ValidationException $e) {
             return response()->json([
-                'error' => 'Error de validación',
+                'error' => 'Error de validación con los datos para obtener la forma de pago',
                 'message' => $e->errors(),
             ], 422);
         } catch (\Exception $e) {
@@ -63,7 +63,7 @@ class formasPagosController extends Controller
             return response()->json($forma);
         } catch (ValidationException $e) {
             return response()->json([
-                'error' => 'Error de validación',
+                'error' => 'Error de validación al crear el registro de la forma de pago',
                 'message' => $e->errors(),
             ], 422);
         } catch (\Exception $e) {
@@ -103,7 +103,7 @@ class formasPagosController extends Controller
             ], 404);
         } catch (ValidationException $e) {
             return response()->json([
-                'error' => 'Error de validación',
+                'error' => 'Error de validación al modificar el registro de la forma de pago',
                 'message' => $e->errors(),
             ], 422);
         } catch (\Exception $e) {
@@ -133,7 +133,7 @@ class formasPagosController extends Controller
             ], 404);
         } catch (ValidationException $e) {
             return response()->json([
-                'error' => 'Error de validación',
+                'error' => 'Error de validación en los datos proporcionados para eliminar la forma de pago',
                 'message' => $e->errors(),
             ], 422);
         } catch (\Exception $e) {

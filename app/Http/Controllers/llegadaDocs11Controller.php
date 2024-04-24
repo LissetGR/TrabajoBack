@@ -84,7 +84,7 @@ class llegadaDocs11Controller extends Controller
         try {
 
             $validator = $request->validate([
-                '*' => ['sometimes', new CamposPermitidos(['id','doc1','doc2','fecha'])],
+                '*' => ['sometimes', new CamposPermitidos(['id','doc1','doc2','fecha', 'created_at', 'updated_at'])],
                 'fecha' => 'required|date|date_format:d/m/Y',
                 'doc1' => ['required', 'string',
                 function ($attribute, $value, $fail) {

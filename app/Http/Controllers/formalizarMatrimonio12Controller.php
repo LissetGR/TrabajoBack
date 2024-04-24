@@ -27,7 +27,7 @@ class formalizarMatrimonio12Controller extends Controller
             ], 404);
             }catch (ValidationException $e) {
                 return response()->json([
-                    'error' => 'Error de validación',
+                    'error' => 'Error de validación de los datos para visualizar los datos',
                     'message' => $e->errors(),
                 ], 422);
             }
@@ -41,7 +41,7 @@ class formalizarMatrimonio12Controller extends Controller
         try{
 
             $validator= $request->validate([
-                '*' => ['sometimes', new CamposPermitidos(['fecha', 'lugar','tipo'])],
+                '*' => ['sometimes', new CamposPermitidos(['fecha', 'lugar','tipo','created_at','updated_at'])],
                 'fecha'=>'required|date|date_format:d/m/Y',
                 'lugar'=>'required|string|',
                 'tipo'=>['required','string',
@@ -63,7 +63,7 @@ class formalizarMatrimonio12Controller extends Controller
 
         }catch (ValidationException $e) {
             return response()->json([
-                'error' => 'Error de validación',
+                'error' => 'Error de validación al crear un registro en la tabla formalizar matrimonio',
                 'message' => $e->errors(),
             ], 422);
         }catch (\Exception $e) {
@@ -76,16 +76,16 @@ class formalizarMatrimonio12Controller extends Controller
         try{
 
             $validator= $request->validate([
-                '*' => ['sometimes', new CamposPermitidos(['id','fecha', 'lugar','tipo'])],
+                '*' => ['sometimes', new CamposPermitidos(['created_at','updated_at','id','fecha', 'lugar','tipo'])],
                 'fecha'=>'required|date|date_format:d/m/Y',
                 'lugar'=>'required|string|',
-                'tipo'=>'required','string',
+                'tipo'=>['required','string',
                 function ($attribute, $value, $fail) {
                     $allowedValues = ['Divizioni dei beni', ' Comunidad dei beni'];
                     if (!in_array(strtolower($value), array_map('strtolower', $allowedValues))) {
                         $fail($attribute . ' Campo no valido');
                     }
-                },
+                }],
             ]);
 
             $formalizar=formalizar_Matrim12::findOrFail($request->input('id'));
@@ -102,7 +102,7 @@ class formalizarMatrimonio12Controller extends Controller
         }
         catch (ValidationException $e) {
             return response()->json([
-                'error' => 'Error de validación',
+                'error' => 'Error de validación al modificar un registro en la tabla formalizar matrimonio',
                 'message' => $e->errors(),
             ], 422);
         }
@@ -132,7 +132,7 @@ class formalizarMatrimonio12Controller extends Controller
         }
         catch (ValidationException $e) {
             return response()->json([
-                'error' => 'Error de validación',
+                'error' => 'Error de validación con los datos para eliminar el registro de la tabla formalizar matrimonio',
                 'message' => $e->errors(),
             ], 422);
         }

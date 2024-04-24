@@ -46,7 +46,7 @@ class AuthController extends Controller
             ], 200);
         } catch (ValidationException $e) {
             return response()->json([
-                'error' => 'Error de validación',
+                'error' => 'Error de validación en los datos del usuario',
                 'message' => $e->errors(),
             ], 422);
         } catch (\Exception $error) {
@@ -133,7 +133,7 @@ class AuthController extends Controller
             ], 200);
         } catch (ValidationException $e) {
             return response()->json([
-                'error' => 'Error de validación',
+                'error' => 'Error de validación en los datos del usuario',
                 'message' => $e->errors(),
             ], 422);
         } catch (ModelNotFoundException $e) {

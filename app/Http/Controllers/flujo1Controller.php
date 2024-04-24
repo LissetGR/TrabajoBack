@@ -15,6 +15,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Validation\ValidationException;
 use App\Rules\CamposPermitidos;
+
 class flujo1Controller extends Controller
 {
 
@@ -23,10 +24,10 @@ class flujo1Controller extends Controller
         try {
             $validator = $request->validate([
                 '*' => ['sometimes', new CamposPermitidos(['id'])],
-                'id' => 'required|numeric'
+                'numero' => 'required|numeric'
             ]);
 
-            $flujo = Flujo1::where('id_matrimonio', $validator['id'])->get();
+            $flujo = Flujo1::where('id_matrimonio', $validator['numero'])->get();
             return response()->json(Flujo1Resource::collection($flujo));
         } catch (ModelNotFoundException $e) {
             return response()->json([
@@ -35,7 +36,7 @@ class flujo1Controller extends Controller
             ], 404);
         } catch (ValidationException $e) {
             return response()->json([
-                'error' => 'Error de validación',
+                'error' => 'Error de validación de los datos para visualizar su registro del flujo ',
                 'message' => $e->errors(),
             ], 422);
         } catch (\Exception $e) {
@@ -57,7 +58,7 @@ class flujo1Controller extends Controller
             DB::beginTransaction();
             try {
                 $validator = $request->validate([
-                    '*' => ['sometimes', new CamposPermitidos([ 'observaciones','cm_minrex','tercer_Email','retirada_CM','procura_minrex','segundo_Email', 'id_matrimonio','primer_Email','email_Cubano','fecha_ProcuraT', 'fecha_MatrimonioT', 'cuarto_Email','doc1', 'doc2', 'fecha_llegada','tipo', 'lugar', 'fecha_formalizar', 'coordinar_Matrim','fecha_ProcuraRetirar', 'fecha_MatrimonioRetirar'])],
+                    '*' => ['sometimes', new CamposPermitidos(['id_llegada_documentos', 'id_traduccion', 'id', 'id_retiroDocsMinrex','id_formalizarMatrimonio','observaciones','procura_minrex', 'cm_minrex', 'tercer_Email', 'segundo_Email', 'id_matrimonio', 'primer_Email', 'email_Cubano', 'cuarto_Email', 'coordinar_Matrim'])],
                     'id_matrimonio' => 'required|unique:flujo1s|numeric',
                     'primer_Email' => 'nullable|date|date_format:d/m/Y',
                     'email_Cubano' => 'nullable|date|date_format:d/m/Y',
@@ -72,12 +73,8 @@ class flujo1Controller extends Controller
                 ]);
 
 
-                if ($request->Filled(['doc1', 'doc2', 'fecha_llegada'])) {
-                    $datos = [
-                        'doc1' => $request->input('doc1'),
-                        'doc2' => $request->input('doc2'),
-                        'fecha' => $request->input('fecha_llegada')
-                    ];
+                if ($request->input('id_llegada_documentos')) {
+                    $datos = $request->input('id_llegada_documentos');
                     $requestD = new \Illuminate\Http\Request();
                     $requestD->replace($datos);
 
@@ -86,7 +83,7 @@ class flujo1Controller extends Controller
                     $llegada = json_decode(($llegada));
 
                     if (!property_exists($llegada, 'error')) {
-                        $data = $validator + ['id_llegada_documentos' => $llegada->id];
+                        $validator['id_llegada_documentos'] = $llegada->id;
                     } else {
                         return response()->json([
                             'error' => $llegada->error,
@@ -94,22 +91,20 @@ class flujo1Controller extends Controller
                         ], 500);
                     }
                 }
-                if ($request->Filled(['tipo', 'lugar', 'fecha_formalizar', 'coordinar_Matrim'])) {
-                    $datos = [
-                        'tipo' => $request->input('tipo'),
-                        'lugar' => $request->input('lugar'),
-                        'fecha' => $request->input('fecha_formalizar')
-                    ];
+
+
+                if ($request->input('id_formalizarMatrimonio')) {
+                    $datos = $request->input('id_formalizarMatrimonio');
                     $requestD = new \Illuminate\Http\Request();
                     $requestD->replace($datos);
 
-
                     $formalizar = $formalizarController->create($requestD);
+
                     $formalizar = json_encode($formalizar->getData());
-                    $formalizar = json_decode(($formalizar));
+                    $formalizar = json_decode($formalizar);
 
                     if (!property_exists($formalizar, 'error')) {
-                        $data = $data + ['id_formalizarMatrimonio' => $formalizar->id];
+                        $validator['id_formalizarMatrimonio'] =  $formalizar->id;
                     } else {
                         return response()->json([
                             'error' => $formalizar->error,
@@ -117,22 +112,20 @@ class flujo1Controller extends Controller
                         ], 500);
                     }
                 }
-                if ($request->Filled(['fecha_ProcuraRetirar', 'fecha_MatrimonioRetirar', 'cm_minrex'])) {
-                    $datos = [
-                        'fecha_Procura' => $request->input('fecha_ProcuraRetirar'),
-                        'fecha_Matrimonio' => $request->input('fecha_MatrimonioRetirar'),
-                    ];
+                if ($request->input('id_retiroDocsMinrex')) {
+                    $datos = $request->input('id_retiroDocsMinrex');
                     $requestD = new \Illuminate\Http\Request();
                     $requestD->replace($datos);
 
 
                     $retirar = $retirarController->create($requestD);
+
+
                     $retirar = json_encode($retirar->getData());
                     $retirar = json_decode(($retirar));
 
-
                     if (!property_exists($retirar, 'error')) {
-                        $data = $data + ['id_retiroDocsMinrex' => $retirar->id];
+                        $validator['id_retiroDocsMinrex'] = $retirar->id;
                     } else {
                         return response()->json([
                             'error' => $retirar->error,
@@ -140,22 +133,19 @@ class flujo1Controller extends Controller
                         ], 500);
                     }
                 }
-                if ($request->Filled(['fecha_ProcuraT', 'fecha_MatrimonioT', 'cuarto_Email'])) {
-                    $datos = [
-                        'fecha_Procura' => $request->input('fecha_ProcuraT'),
-                        'fecha_Matrimonio' => $request->input('fecha_MatrimonioT'),
-                    ];
+                if ($request->input('id_traduccion')) {
+                    $datos = $request->input('id_traduccion');
                     $requestD = new \Illuminate\Http\Request();
                     $requestD->replace($datos);
 
 
                     $traduccion = $traduccionController->create($requestD);
+
                     $traduccion = json_encode($traduccion->getData());
                     $traduccion = json_decode(($traduccion));
 
-
                     if (!property_exists($traduccion, 'error')) {
-                        $data = $data + ['id_traduccion' => $traduccion->id];
+                        $validator['id_traduccion'] = $traduccion->id;
                     } else {
                         return response()->json([
                             'error' => $traduccion->error,
@@ -164,7 +154,7 @@ class flujo1Controller extends Controller
                     }
                 }
 
-                $flujo1 = Flujo1::create($data);
+                $flujo1 = Flujo1::create($validator);
 
                 DB::commit();
 
@@ -193,7 +183,7 @@ class flujo1Controller extends Controller
             ], 404);
         } catch (ValidationException $e) {
             return response()->json([
-                'error' => 'Error de validación',
+                'error' => 'Error de validación de los datos para crear el flujo',
                 'message' => $e->errors(),
             ], 422);
         } catch (\Exception $e) {
@@ -215,9 +205,9 @@ class flujo1Controller extends Controller
             DB::beginTransaction();
             try {
                 $validator = $request->validate([
-                    '*' => ['sometimes', new CamposPermitidos(['id_traduccion','id_retirar','id_formalizar','id_llegada', 'observaciones','cm_minrex','tercer_Email','retirada_CM','procura_minrex','segundo_Email', 'id_matrimonio','primer_Email','email_Cubano','fecha_ProcuraT', 'fecha_MatrimonioT', 'cuarto_Email','doc1', 'doc2', 'fecha_llegada','tipo', 'lugar', 'fecha_formalizar', 'coordinar_Matrim','fecha_ProcuraRetirar', 'fecha_MatrimonioRetirar'])],
+                    '*' => ['sometimes', new CamposPermitidos(['id_formalizarMatrimonio', 'created_at', 'updated_at', 'id_llegada_documentos', 'id_traduccion', 'id', 'id_retiroDocsMinrex', 'observaciones', 'cm_minrex', 'tercer_Email', 'retirada_CM', 'procura_minrex', 'segundo_Email', 'id_matrimonio', 'primer_Email', 'email_Cubano', 'cuarto_Email',  'coordinar_Matrim'])],
                     'id_matrimonio' => 'required|numeric',
-                    'id_flujo' => 'required|numeric',
+                    'id' => 'required|numeric',
                     'primer_Email' => 'nullable|date|date_format:d/m/Y',
                     'email_Cubano' => 'nullable|date|date_format:d/m/Y',
                     'coordinar_Matrim' => 'nullable|date|date_format:d/m/Y',
@@ -231,15 +221,10 @@ class flujo1Controller extends Controller
                 ]);
 
 
-                $flujo1 = Flujo1::findOrFail($request->input('id_flujo'));
+                $flujo1 = Flujo1::findOrFail($request->input('id'));
 
-                if ($request->Filled(['id_llegada', 'doc1', 'doc2', 'fecha_llegada'])) {
-                    $datos = [
-                        'id' => $request->input('id_llegada'),
-                        'doc1' => $request->input('doc1'),
-                        'doc2' => $request->input('doc2'),
-                        'fecha' => $request->input('fecha_llegada')
-                    ];
+                if ($request->input('id_llegada_documentos')) {
+                    $datos = $request->input('id_llegada_documentos');
                     $requestD = new \Illuminate\Http\Request();
                     $requestD->replace($datos);
 
@@ -248,7 +233,7 @@ class flujo1Controller extends Controller
                     $llegada = json_decode(($llegada));
 
                     if (!property_exists($llegada, 'error')) {
-                        $data = $validator + ['id_llegada_documentos' => $llegada->id];
+                        $validator['id_llegada_documentos'] = $llegada->id;
                     } else {
                         return response()->json([
                             'error' => $llegada->error,
@@ -256,22 +241,22 @@ class flujo1Controller extends Controller
                         ], 500);
                     }
                 }
-                if ($request->Filled(['id_formalizar', 'tipo', 'lugar', 'fecha_formalizar'])) {
-                    $datos = [
-                        'id' => $request->input('id_formalizar'),
-                        'tipo' => $request->input('tipo'),
-                        'lugar' => $request->input('lugar'),
-                        'fecha' => $request->input('fecha_formalizar')
-                    ];
+
+                if ($request->input('id_formalizarMatrimonio')) {
+                    $datos = $request->input('id_formalizarMatrimonio');
                     $requestD = new \Illuminate\Http\Request();
                     $requestD->replace($datos);
 
-                    $formalizar = $formalizarController->modificar($requestD);
+                    if ($request->has('id_formalizarMatrimonio.id')) {
+                        $formalizar = $formalizarController->modificar($requestD);
+                    } else {
+                        $formalizar = $formalizarController->create($requestD);
+                    }
                     $formalizar = json_encode($formalizar->getData());
-                    $formalizar = json_decode(($formalizar));
+                    $formalizar = json_decode($formalizar);
 
                     if (!property_exists($formalizar, 'error')) {
-                        $data = $data + ['id_formalizarMatrimonio' => $formalizar->id];
+                        $validator['id_formalizarMatrimonio'] =  $formalizar->id;
                     } else {
                         return response()->json([
                             'error' => $formalizar->error,
@@ -279,21 +264,22 @@ class flujo1Controller extends Controller
                         ], 500);
                     }
                 }
-                if ($request->Filled(['id_retirar', 'fecha_ProcuraRetirar', 'fecha_MatrimonioRetirar'])) {
-                    $datos = [
-                        'id' => $request->input('id_retirar'),
-                        'fecha_Procura' => $request->input('fecha_ProcuraRetirar'),
-                        'fecha_Matrimonio' => $request->input('fecha_MatrimonioRetirar'),
-                    ];
+                if ($request->input('id_retiroDocsMinrex')) {
+                    $datos = $request->input('id_retiroDocsMinrex');
                     $requestD = new \Illuminate\Http\Request();
                     $requestD->replace($datos);
 
-                    $retirar = $retirarController->modificar($requestD);
+                    if ($request->has('id_retiroDocsMinrex.id')) {
+                        $retirar = $retirarController->modificar($requestD);
+                    } else {
+                        $retirar = $retirarController->create($requestD);
+                    }
+
                     $retirar = json_encode($retirar->getData());
                     $retirar = json_decode(($retirar));
 
                     if (!property_exists($retirar, 'error')) {
-                        $data = $data + ['id_retiroDocsMinrex' => $retirar->id];
+                        $validator['id_retiroDocsMinrex'] = $retirar->id;
                     } else {
                         return response()->json([
                             'error' => $retirar->error,
@@ -301,21 +287,21 @@ class flujo1Controller extends Controller
                         ], 500);
                     }
                 }
-                if ($request->Filled(['id_traduccion', 'fecha_ProcuraT', 'fecha_MatrimonioT'])) {
-                    $datos = [
-                        'id' => $request->input('id_traduccion'),
-                        'fecha_Procura' => $request->input('fecha_ProcuraT'),
-                        'fecha_Matrimonio' => $request->input('fecha_MatrimonioT'),
-                    ];
+                if ($request->input('id_traduccion')) {
+                    $datos = $request->input('id_traduccion');
                     $requestD = new \Illuminate\Http\Request();
                     $requestD->replace($datos);
 
-                    $traduccion = $traduccionController->modificar($requestD);
+                    if ($request->has('id_traduccion.id')) {
+                        $traduccion = $traduccionController->modificar($requestD);
+                    } else {
+                        $traduccion = $traduccionController->create($requestD);
+                    }
                     $traduccion = json_encode($traduccion->getData());
                     $traduccion = json_decode(($traduccion));
 
                     if (!property_exists($traduccion, 'error')) {
-                        $data = $data + ['id_traduccion' => $traduccion->id];
+                        $validator['id_traduccion'] = $traduccion->id;
                     } else {
                         return response()->json([
                             'error' => $traduccion->error,
@@ -325,8 +311,7 @@ class flujo1Controller extends Controller
                 }
 
                 DB::commit();
-
-                $flujo1->update($data);
+                $flujo1->update($validator);
 
                 $matrimonio = Matrimonio::findOrFail($request->input('id_matrimonio'));
                 $flujo1->matrimonio()->associate($matrimonio);
@@ -343,7 +328,7 @@ class flujo1Controller extends Controller
             ], 404);
         } catch (ValidationException $e) {
             return response()->json([
-                'error' => 'Error de validación',
+                'error' => 'Error de validación de los datos para modificar el flujo',
                 'message' => $e->errors(),
             ], 422);
         } catch (\Exception $e) {
@@ -357,10 +342,10 @@ class flujo1Controller extends Controller
         try {
             $validator = $request->validate([
                 '*' => ['sometimes', new CamposPermitidos(['id'])],
-                'id' => 'required|numeric'
+                'numero' => 'required|numeric'
             ]);
 
-            $flujo = Flujo1::with(['llegadaDocs', 'formalizarMatrimonio', 'retiroDocs', 'traduccion'])->findOrFail($validator['id']);
+            $flujo = Flujo1::with(['llegadaDocs', 'formalizarMatrimonio', 'retiroDocs', 'traduccion'])->where('id_matrimonio', $validator['numero'])->first();
 
             $flujo->delete();
             $flujo->llegadaDocs()->delete();
@@ -375,7 +360,7 @@ class flujo1Controller extends Controller
             ], 404);
         } catch (ValidationException $e) {
             return response()->json([
-                'error' => 'Error de validación',
+                'error' => 'Error de validación de los datos para eliminar el flujo',
                 'message' => $e->errors(),
             ], 422);
         } catch (\Exception $e) {
