@@ -10,6 +10,7 @@ use App\Models\Flujo3;
 use App\Models\cuotas;
 use App\Models\formaPago;
 use App\Models\Matrimonio;
+use App\Models\observaciones;
 use Illuminate\Database\Seeder;
 
 class DatabaseSeeder extends Seeder
@@ -40,6 +41,8 @@ class DatabaseSeeder extends Seeder
             Flujo3::factory()->count(1)->withMatrimonioId($matrimonioId)->create();
 
             formaPago::factory()->count(1)->withMatrimonioId($matrimonioId)->create();
+            
+            observaciones::factory()->count(1)->withMatrimonioId($matrimonioId)->create();
         }
 
         cuotas::factory()->count(5)->create();

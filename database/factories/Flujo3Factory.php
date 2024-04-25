@@ -19,7 +19,6 @@ class Flujo3Factory extends Factory
     public function definition(): array
     {
         return [
-            // 'id_matrimonio' => Matrimonio::factory()->create()->id,
             'id_prepararDocs' => preparar_Docs31::factory()->create()->id,
             'cita_cubano' => $this->faker->date(),
             'solicitud_visado' => $this->faker->date(),

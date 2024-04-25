@@ -17,8 +17,15 @@ class observacionesFactory extends Factory
     public function definition(): array
     {
         return [
-            'id_matrimonio' =>Matrimonio::factory(),
             'descripcion' => $this->faker->sentence(),
         ];
+    }
+
+    public function withMatrimonioId($matrimonioId){
+        return $this->state(function (array $attributes) use ($matrimonioId) {
+            return [
+                'id_matrimonio' => $matrimonioId,
+            ];
+        });
     }
 }

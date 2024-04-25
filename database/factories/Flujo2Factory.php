@@ -19,7 +19,6 @@ class Flujo2Factory extends Factory
     public function definition(): array
     {
         return [
-        // 'id_matrimonio' => Matrimonio::factory(),
         'id_prepararDocs' => preparar_Doc21::factory(),
         'cita_trans' => $this->faker->date(),
         'quinto_Email' => $this->faker->date(),
