@@ -26,7 +26,7 @@ class MatrimonioController extends Controller
         $limit = $request->input('limit', 10);
         try{
             $matrimonios=Matrimonio::paginate($limit);
-            return response()->json($matrimonios->items());
+            return response()->json(MatrimonioResource::collection($matrimonios->items()));
         }catch(\Exception $e){
             return response()->json($e->getMessage());
         }
@@ -40,7 +40,7 @@ class MatrimonioController extends Controller
                 'numero' => 'numeric|required'
             ]);
 
-            $matrimonio = matrimonio::with(['flujo1.llegadaDocs', 'flujo1.formalizarMatrimonio', 'flujo1.retiroDocs', 'flujo1.traduccion', 'flujo2.preparacionDocumentos', 'flujo3.preparacionDocumentos'])->findOrFail($validator['numero']);
+            $matrimonio = matrimonio::findOrFail($validator['numero']);
             return response()->json(new MatrimonioResource($matrimonio));
         } catch (ModelNotFoundException $e) {
             return response()->json([
@@ -83,20 +83,24 @@ class MatrimonioController extends Controller
 
             $matrimonios = Matrimonio::query()
                 ->when($request->has('nombre'), function ($query) use ($validator) {
-                    $query->whereHas('usuario_italiano', function ($query) use ($validator) {
-                        $query->where(DB::raw('lower(nombre_apellidos)'), 'LIKE', '%' . strtolower($validator['nombre']) . '%');
-                    })
+                    $query->where(function ($query) use ($validator) {
+                        $query->whereHas('usuario_italiano', function ($query) use ($validator) {
+                            $query->where(DB::raw('lower(nombre_apellidos)'), 'LIKE',  strtolower($validator['nombre']) . '%');
+                        })
                         ->orWhereHas('usuario_cubano', function ($query) use ($validator) {
                             $query->where(DB::raw('lower(nombre_apellidos)'), 'LIKE', '%' . strtolower($validator['nombre']) . '%');
                         });
+                    });
                 })
                 ->when($request->has('pasaporte'), function ($query) use ($validator) {
-                    $query->whereHas('usuario_italiano', function ($query) use ($validator) {
-                        $query->where(DB::raw('lower(pasaporte)'), 'LIKE', '%' . strtolower($validator['pasaporte']) . '%');
-                    })
+                    $query->where(function ($query) use ($validator) {
+                        $query->whereHas('usuario_italiano', function ($query) use ($validator) {
+                            $query->where(DB::raw('lower(pasaporte)'), 'LIKE', '%' . strtolower($validator['pasaporte']) . '%');
+                        })
                         ->orWhereHas('usuario_cubano', function ($query) use ($validator) {
                             $query->where(DB::raw('lower(pasaporte)'), 'LIKE', '%' . strtolower($validator['pasaporte']) . '%');
                         });
+                    });
                 })
                 ->when($request->has('numero'), function ($query) use ($validator) {
                     return $query->where('numero', $validator['numero']);
@@ -304,39 +308,39 @@ class MatrimonioController extends Controller
             $validator = $request->validate([
                 '*' => ['sometimes', new CamposPermitidos(['numero', 'pasaporte', 'nombre','mes','anno','dia'])],
                 'nombre' => 'string',
+                'pasaporte' => 'string',
                 'numero' => 'numeric',
                 'anno' => 'integer|between:' . $hundred_years_ago . ',' . $current_year,
                 'mes' => 'integer|between:1,12',
                 'dia' => 'integer|between:1,31',
             ]);
 
-
-            $matrimonios = Matrimonio::whereHas('forma_pago', function ($query) {
-                $query->where('tipo', 'Pagato totale');
-            })
-                ->orWhereHas('forma_pago', function ($query) {
-                    $query->where('tipo', 'Acconto')
-                        ->whereExists(function ($query) {
-                            $query->select(DB::raw(1))
-                                ->from('matrimonios')
-                                ->whereRaw('matrimonios.costo = forma_pagos.monto_pago');
-                        });
+            $matrimonios = Matrimonio::query()
+                ->whereHas('forma_pago', function ($query) {
+                    $query->whereRaw('matrimonios.costo <= forma_pagos.monto_pago');
                 })
                 ->when($request->has('nombre'), function ($query) use ($validator) {
-                    return $query->whereHas('usuario_italiano', function ($query) use ($validator) {
-                        $query->where(DB::raw('lower(nombre_apellidos)'), 'LIKE', '%' . strtolower($validator['nombre'] . '%'));
-                    })
+                    $query->where(function ($query) use ($validator) {
+                        $query->whereHas('usuario_italiano', function ($query) use ($validator) {
+                            $query->where(DB::raw('lower(nombre_apellidos)'), 'LIKE', '%' . strtolower($validator['nombre']) . '%');
+                        })
                         ->orWhereHas('usuario_cubano', function ($query) use ($validator) {
-                            $query->where(DB::raw('lower(nombre_apellidos)'), 'LIKE', '%' . strtolower($validator['nombre'] . '%'));
+                            $query->where(DB::raw('lower(nombre_apellidos)'), 'LIKE', '%' . strtolower($validator['nombre']) . '%');
                         });
+                    });
                 })
                 ->when($request->has('pasaporte'), function ($query) use ($validator) {
-                    return $query->whereHas('usuario_italiano', function ($query) use ($validator) {
-                        $query->where(DB::raw('lower(pasaporte)'), 'LIKE', '%' . strtolower($validator['pasaporte'] . '%'));
-                    })
+                    $query->where(function ($query) use ($validator) {
+                        $query->whereHas('usuario_italiano', function ($query) use ($validator) {
+                            $query->where(DB::raw('lower(pasaporte)'), 'LIKE', '%' . strtolower($validator['pasaporte']) . '%');
+                        })
                         ->orWhereHas('usuario_cubano', function ($query) use ($validator) {
-                            $query->where(DB::raw('lower(pasaporte)'), 'LIKE', '%' . strtolower($validator['pasaporte'] . '%'));
+                            $query->where(DB::raw('lower(pasaporte)'), 'LIKE', '%' . strtolower($validator['pasaporte']) . '%');
                         });
+                    });
+                })
+                ->when($request->has('numero'), function ($query) use ($validator) {
+                    return $query->where('numero', $validator['numero']);
                 })
                 ->when($request->has('day'), function ($query) use ($validator) {
                     return $query->whereDay('fecha_llegada', $validator['day']);
@@ -347,7 +351,6 @@ class MatrimonioController extends Controller
                 ->when($request->has('anno'), function ($query) use ($validator) {
                     return $query->whereYear('fecha_llegada', $validator['anno']);
                 })
-                ->with(['flujo1.llegadaDocs', 'flujo1.formalizarMatrimonio', 'flujo1.retiroDocs', 'flujo1.traduccion', 'flujo2.preparacionDocumentos', 'flujo3.preparacionDocumentos'])
                 ->get();
 
             if ($matrimonios->isNotEmpty()) {
@@ -384,32 +387,32 @@ class MatrimonioController extends Controller
                 'dia' => 'integer|between:1,31',
             ]);
 
-            $matrimonios = Matrimonio::whereDoesntHave('forma_pago', function ($query) {
-                $query->where('tipo', 'Pagato totale');
-            })
-                ->orWhereHas('forma_pago', function ($query) {
-                    $query->where('tipo', 'Acconto')
-                        ->whereExists(function ($query) {
-                            $query->select(DB::raw(1))
-                                ->from('matrimonios')
-                                ->whereRaw('matrimonios.costo != forma_pagos.monto_pago');
-                        });
+            $matrimonios = Matrimonio::query()
+                ->whereHas('forma_pago', function ($query) {
+                    $query->whereRaw('matrimonios.costo >= forma_pagos.monto_pago');
                 })
                 ->when($request->has('nombre'), function ($query) use ($validator) {
-                    return $query->whereHas('usuario_italiano', function ($query) use ($validator) {
-                        $query->where(DB::raw('lower(nombre_apellidos)'), 'LIKE', '%' . strtolower($validator['nombre'] . '%'));
-                    })
+                    $query->where(function ($query) use ($validator) {
+                        $query->whereHas('usuario_italiano', function ($query) use ($validator) {
+                            $query->where(DB::raw('lower(nombre_apellidos)'), 'LIKE', '%' . strtolower($validator['nombre']) . '%');
+                        })
                         ->orWhereHas('usuario_cubano', function ($query) use ($validator) {
-                            $query->where(DB::raw('lower(nombre_apellidos)'), 'LIKE', '%' . strtolower($validator['nombre'] . '%'));
+                            $query->where(DB::raw('lower(nombre_apellidos)'), 'LIKE', '%' . strtolower($validator['nombre']) . '%');
                         });
+                    });
                 })
                 ->when($request->has('pasaporte'), function ($query) use ($validator) {
-                    return $query->whereHas('usuario_italiano', function ($query) use ($validator) {
-                        $query->where(DB::raw('lower(pasaporte)'), 'LIKE', '%' . strtolower($validator['pasaporte'] . '%'));
-                    })
+                    $query->where(function ($query) use ($validator) {
+                        $query->whereHas('usuario_italiano', function ($query) use ($validator) {
+                            $query->where(DB::raw('lower(pasaporte)'), 'LIKE', '%' . strtolower($validator['pasaporte']) . '%');
+                        })
                         ->orWhereHas('usuario_cubano', function ($query) use ($validator) {
-                            $query->where(DB::raw('lower(pasaporte)'), 'LIKE', '%' . strtolower($validator['pasaporte'] . '%'));
+                            $query->where(DB::raw('lower(pasaporte)'), 'LIKE', '%' . strtolower($validator['pasaporte']) . '%');
                         });
+                    });
+                })
+                ->when($request->has('numero'), function ($query) use ($validator) {
+                    return $query->where('numero', $validator['numero']);
                 })
                 ->when($request->has('day'), function ($query) use ($validator) {
                     return $query->whereDay('fecha_llegada', $validator['day']);
@@ -420,7 +423,6 @@ class MatrimonioController extends Controller
                 ->when($request->has('anno'), function ($query) use ($validator) {
                     return $query->whereYear('fecha_llegada', $validator['anno']);
                 })
-                ->with(['flujo1.llegadaDocs', 'flujo1.formalizarMatrimonio', 'flujo1.retiroDocs', 'flujo1.traduccion', 'flujo2.preparacionDocumentos', 'flujo3.preparacionDocumentos'])
                 ->get();
 
             if ($matrimonios->isNotEmpty()) {

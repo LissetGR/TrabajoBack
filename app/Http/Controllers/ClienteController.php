@@ -33,14 +33,9 @@ class ClienteController extends Controller
         $limit = $request->input('limit', 10);
 
         try{
-            $clientes = Cliente::doesntHave('cliente_italiano')->paginate($limit);
-            $clienteItaliano = ClienteItaliano::paginate($limit);
+            $clientes= cliente::with('cliente_italiano')->paginate($limit);
 
-            $respuesta = [
-                'clientes cubanos' => $clientes->items(),
-                'clientes italianos' => ClienteItalianoResource::collection($clienteItaliano)
-            ];
-            return response()->json($respuesta);
+            return response()->json($clientes->items());
         }catch(\Exception $e){
             return response()->json($e->getMessage());
         }

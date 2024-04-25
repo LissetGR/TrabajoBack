@@ -13,15 +13,11 @@ return new class extends Migration
     {
         Schema::create('preparar__doc21s', function (Blueprint $table) {
             $table->bigIncrements('id');
-            // $table->unsignedBigInteger('id_flujo2');
             $table->date('doc_provItalia21');
             $table->boolean('solicitud_Trans');
             $table->boolean('delegacion');
             $table->boolean('certificado_residencia');
             $table->boolean('doc_idItaliano');
-
-
-            // $table->foreign('id_flujo2')->references('id')->on('flujo2s')->onDelete('cascade')->onUpdate('cascade');
 
             $table->timestamps();
         });

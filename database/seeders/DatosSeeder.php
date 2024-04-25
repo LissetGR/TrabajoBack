@@ -28,22 +28,6 @@ class DatosSeeder extends Seeder
             'role'=>'Cliente'
         ])->assignRole('Cliente');
 
-
-        $cliente=cliente::create([
-                "username"=>"lisselitaI",
-                "nombre_apellidos"=> "leordany gvhgvytfyvghvy",
-                "direccion"=> "las cadenas La palma",
-                "telefono"=> 55254688,
-                "email"=>"liss@gmail.com",
-        ]);
-
-        $cliente=cliente::create([
-            "username"=>"lisselitaC",
-            "nombre_apellidos"=> "leordany gvhgvytfyvghvy",
-            "direccion"=> "las cadenas La palma",
-            "telefono"=> 55254688,
-            "email"=>"liss@gmail.com",
-    ]);
     }
 
 }
