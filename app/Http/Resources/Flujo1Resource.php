@@ -30,7 +30,7 @@ class Flujo1Resource extends JsonResource
             'id_retiroDocsMinrex'=>$this->retiroDocs,
             'cuarto_Email' =>$this->cuarto_Email,
             'id_traduccion'=>$this->traduccion,
-            'observaciones'=>$this->observaciones
+            'observaciones'=>$this->observaciones,
         ];
     }
 }

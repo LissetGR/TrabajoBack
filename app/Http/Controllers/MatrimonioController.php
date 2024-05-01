@@ -25,7 +25,8 @@ class MatrimonioController extends Controller
     public function getAllMatrimonios(Request $request){
         $limit = $request->input('limit', 10);
         try{
-            $matrimonios=Matrimonio::paginate($limit);
+
+            $matrimonios=Matrimonio::with('usuario_italiano.cliente_italiano')->paginate($limit);
             return response()->json(MatrimonioResource::collection($matrimonios->items()));
         }catch(\Exception $e){
             return response()->json($e->getMessage());
@@ -40,7 +41,7 @@ class MatrimonioController extends Controller
                 'numero' => 'numeric|required'
             ]);
 
-            $matrimonio = matrimonio::findOrFail($validator['numero']);
+            $matrimonio = matrimonio::with('usuario_italiano.cliente_italiano')->findOrFail($validator['numero']);
             return response()->json(new MatrimonioResource($matrimonio));
         } catch (ModelNotFoundException $e) {
             return response()->json([
@@ -117,6 +118,7 @@ class MatrimonioController extends Controller
                 ->when($request->has('anno'), function ($query) use ($validator) {
                     return $query->whereYear('fecha_llegada', $validator['anno']);
                 })
+                ->with('usuario_italiano.cliente_italiano')
                 ->get();
 
             if ($matrimonios->isNotEmpty()) {
@@ -351,6 +353,7 @@ class MatrimonioController extends Controller
                 ->when($request->has('anno'), function ($query) use ($validator) {
                     return $query->whereYear('fecha_llegada', $validator['anno']);
                 })
+                ->with('usuario_italiano.cliente_italiano')
                 ->get();
 
             if ($matrimonios->isNotEmpty()) {
@@ -423,6 +426,7 @@ class MatrimonioController extends Controller
                 ->when($request->has('anno'), function ($query) use ($validator) {
                     return $query->whereYear('fecha_llegada', $validator['anno']);
                 })
+                ->with('usuario_italiano.cliente_italiano')
                 ->get();
 
             if ($matrimonios->isNotEmpty()) {

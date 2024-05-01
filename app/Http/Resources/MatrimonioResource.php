@@ -16,7 +16,7 @@ class MatrimonioResource extends JsonResource
     {
         return [
             'numero'=>$this->numero,
-            'username_italiano'=>$this->usuario_italiano,
+            'username_italiano'=> $this->usuario_italiano,
             'username_cubano'=>$this->usuario_cubano,
             'fecha_llegada'=>$this->fecha_llegada,
             'costo'=>$this->costo,
