@@ -94,6 +94,8 @@ class ClienteItalianoController extends Controller
                     'email_registro' => $validator['email_registro'],
                 ]);
 
+                $cliente_italiano->cliente()->associate($cliente);
+
                 DB::commit();
 
                 return response()->json(new ClienteItalianoResource($cliente_italiano));
@@ -120,6 +122,7 @@ class ClienteItalianoController extends Controller
                 'id' => 'required|numeric',
                 'username' => 'required|string|min:8|max:100|alpha_dash',
                 'nombre_apellidos' => 'required|string|min:10',
+                'pasaporte' => 'required|string|min:7|max:7|alpha_dash|',
                 'direccion' => 'required|string|min:10',
                 'telefono' => 'required|numeric|min:8',
                 'email' => 'required|email',
@@ -128,11 +131,13 @@ class ClienteItalianoController extends Controller
 
 
             $cliente = cliente::findOrFail($request->input('id'));
-            $cliente_italiano = ClienteItaliano::findOrFail($request->input('id'));
+            // $cliente_italiano = ClienteItaliano::findOrFail($request->input('id'));
             $cliente->update($validator);
-            $cliente_italiano->update([
+            $cliente->cliente_italiano->update([
                 'email_registro' => $validator['email_registro']
             ]);
+
+            $cliente_italiano= $cliente->cliente_italiano;
 
             return response()->json(new ClienteItalianoResource($cliente_italiano));
         } catch (ModelNotFoundException $e) {

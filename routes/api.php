@@ -44,7 +44,7 @@ Route::prefix('auth')->group(function () {
 
 Route::middleware('auth:sanctum')->group( function () {
     Route::post('update',[AuthController::class, 'updatePassword']);
-    Route::put('modificar',[AuthController::class, 'modificar']);
+    Route::patch('modificar',[AuthController::class, 'modificar']);
     Route::post('logout',[AuthController::class, 'logout']);
     Route::get('getUser',[AuthController::class, 'getUser']);
 
@@ -54,13 +54,13 @@ Route::middleware('auth:sanctum')->group( function () {
     Route::get('getBusquedaClientes',[ClienteController::class, 'busquedaClientes']);
     Route::get('getClientByID',[ClienteController::class, 'getClienteById']);
     Route::delete('deleteClient',[ClienteController::class, 'destroy']);
-    Route::put('modificarClient',[ClienteController::class, 'modificar']);
+    Route::patch('modificarClient',[ClienteController::class, 'modificar']);
     Route::get('getClient',[ClienteController::class, 'getCliente']);
     Route::get('getAllClient',[ClienteController::class, 'getAllCliente']);
 
     // Clientes italianos
     Route::post('createClientItalian',[ClienteItalianoController::class, 'create']);
-    Route::put('modificarClientItalian',[ClienteItalianoController::class, 'modificar']);
+    Route::patch('modificarClientItalian',[ClienteItalianoController::class, 'modificar']);
     Route::get('getClientItalian',[ClienteItalianoController::class, 'getClienteItaliano']);
     Route::get('getClientItalianById',[ClienteItalianoController::class, 'getClienteItalianoById']);
     // Route::delete('deleteClientItalian',[ClienteItalianoController::class, 'destroy']);
@@ -70,7 +70,7 @@ Route::middleware('auth:sanctum')->group( function () {
     Route::get('getMatrimonio',[MatrimonioController::class, 'getMatrimonio']);
     Route::get('buscarMatrimonio',[MatrimonioController::class, 'busquedaMatrimonio']);
     Route::delete('deleteMatrimonio',[MatrimonioController::class, 'destroy']);
-    Route::put('modificarMatrimonio',[MatrimonioController::class, 'modificar']);
+    Route::patch('modificarMatrimonio',[MatrimonioController::class, 'modificar']);
     Route::get('getPagos',[MatrimonioController::class, 'getPagos']);
     Route::get('getNoPagos',[MatrimonioController::class, 'getNoPagos']);
     Route::get('getAllMatrimonios',[MatrimonioController::class, 'getAllMatrimonios']);
@@ -79,7 +79,7 @@ Route::middleware('auth:sanctum')->group( function () {
     // formas de pago
     Route::get('getFormaPago',[formasPagosController::class, 'getFormaPago']);
     Route::post('createFormaPago',[formasPagosController::class, 'create']);
-    Route::put('modificarFormaPago',[formasPagosController::class, 'modificar']);
+    Route::patch('modificarFormaPago',[formasPagosController::class, 'modificar']);
     Route::delete('deleteFormaPago',[formasPagosController::class, 'destroy']);
 
 
@@ -87,14 +87,14 @@ Route::middleware('auth:sanctum')->group( function () {
     // flujo1(Primer paso)
     Route::get('getFlujo1',[flujo1Controller::class, 'getFlujo1']);
     Route::post('createFlujo1',[flujo1Controller::class, 'create']);
-    Route::put('modificarFlujo1',[flujo1Controller::class, 'modificar']);
+    Route::patch('modificarFlujo1',[flujo1Controller::class, 'modificar']);
     Route::delete('deleteFlujo1',[flujo1Controller::class, 'destroy']);
 
 
      // flujo2(segundo paso)
      Route::get('getFlujo2',[flujo2Controller::class, 'getFlujo2']);
      Route::post('createFlujo2',[flujo2Controller::class, 'create']);
-     Route::put('modificarFlujo2',[flujo2Controller::class, 'modificar']);
+     Route::patch('modificarFlujo2',[flujo2Controller::class, 'modificar']);
      Route::delete('deleteFlujo2',[flujo2Controller::class, 'destroy']);
 
 
@@ -102,54 +102,54 @@ Route::middleware('auth:sanctum')->group( function () {
      // flujo3(tercer paso)
      Route::get('getFlujo3',[flujo3Controller::class, 'getFlujo3']);
      Route::post('createFlujo3',[flujo3Controller::class, 'create']);
-     Route::put('modificarFlujo3',[flujo3Controller::class, 'modificar']);
+     Route::patch('modificarFlujo3',[flujo3Controller::class, 'modificar']);
      Route::delete('deleteFlujo3',[flujo3Controller::class, 'destroy']);
 
 
     //  formalizar matrimonio
     Route::get('getFormalizar12',[formalizarMatrimonio12Controller::class, 'getFormalizar']);
     Route::post('createFormalizar12',[formalizarMatrimonio12Controller::class, 'create']);
-    Route::put('modificarFormalizar12',[formalizarMatrimonio12Controller::class, 'modificar']);
+    Route::patch('modificarFormalizar12',[formalizarMatrimonio12Controller::class, 'modificar']);
     Route::delete('deleteFormalizar12',[formalizarMatrimonio12Controller::class, 'destroy']);
 
     // llegada de documentos correspondiente al paso 1 del flujo 1
     Route::get('getllegadaDeDocs11',[llegadaDocs11Controller::class, 'getllegadaDoc']);
     Route::post('createllegadaDeDocs11',[llegadaDocs11Controller::class, 'create']);
-    Route::put('modificarllegadaDeDocs11',[llegadaDocs11Controller::class, 'modificar']);
+    Route::patch('modificarllegadaDeDocs11',[llegadaDocs11Controller::class, 'modificar']);
     Route::delete('deletellegadaDeDocs11',[llegadaDocs11Controller::class, 'destroy']);
 
     // preparar documentos correspondiente al paso 1 del flujo 2
     Route::get('getPrepararDoc21',[prepararDocs21Controller::class, 'getPreparar']);
     Route::post('createPrepararDoc21',[prepararDocs21Controller::class, 'create']);
-    Route::put('modificarPrepararDoc21',[prepararDocs21Controller::class, 'modificar']);
+    Route::patch('modificarPrepararDoc21',[prepararDocs21Controller::class, 'modificar']);
     Route::delete('deletePrepararDoc21',[prepararDocs21Controller::class, 'destroy']);
 
 
     // preparar documentos correspondiente al paso 1 del flujo 3
     Route::get('getPrepararDoc31',[prepararDocs31Controller::class, 'getPreparar']);
     Route::post('createPrepararDoc31',[prepararDocs31Controller::class, 'create']);
-    Route::put('modificarPrepararDoc31',[prepararDocs31Controller::class, 'modificar']);
+    Route::patch('modificarPrepararDoc31',[prepararDocs31Controller::class, 'modificar']);
     Route::delete('deletePrepararDoc31',[prepararDocs31Controller::class, 'destroy']);
 
 
     //retirar documentos correspondiente al paso 3 del flujo 1
     Route::get('getRetirar13',[retirarDocs13Controller::class, 'getRetirar']);
     Route::post('createRetirar13',[retirarDocs13Controller::class, 'create']);
-    Route::put('modificarRetirar13',[retirarDocs13Controller::class, 'modificar']);
+    Route::patch('modificarRetirar13',[retirarDocs13Controller::class, 'modificar']);
     Route::delete('deleteRetirar13',[retirarDocs13Controller::class, 'destroy']);
 
 
     // traduccion del paso 4 del flujo 1
     Route::get('getTraduccion',[traduccion14Controller::class, 'getTraduccion']);
     Route::post('createTraduccion',[traduccion14Controller::class, 'create']);
-    Route::put('modificarTraduccion',[traduccion14Controller::class, 'modificar']);
+    Route::patch('modificarTraduccion',[traduccion14Controller::class, 'modificar']);
     Route::delete('deleteTraduccion',[traduccion14Controller::class, 'destroy']);
 
 
     // observaciones
     Route::get('getObservaciones',[observacionesController::class, 'getObservaciones']);
     Route::post('createObservaciones',[observacionesController::class, 'create']);
-    Route::put('modificarObservaciones',[observacionesController::class, 'modificar']);
+    Route::patch('modificarObservaciones',[observacionesController::class, 'modificar']);
     Route::delete('deleteObservaciones',[observacionesController::class, 'destroy']);
 
 
@@ -157,7 +157,7 @@ Route::middleware('auth:sanctum')->group( function () {
     Route::get('getCuotasById',[cuotasController::class, 'getCuotas']);
     Route::get('getCuotas',[cuotasController::class, 'getAllCuotas']);
     Route::post('createCuota',[cuotasController::class, 'create']);
-    Route::put('modificarCuota',[cuotasController::class, 'modificar']);
+    Route::patch('modificarCuota',[cuotasController::class, 'modificar']);
     Route::delete('deleteCuota',[cuotasController::class, 'destroy']);
 });
 
