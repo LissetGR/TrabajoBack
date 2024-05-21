@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Controllers\Controller;
 use App\Http\Resources\MatrimonioResource;
+use App\Http\Resources\reciboResource;
 use App\Models\Cliente;
 use App\Models\ClienteItaliano;
 use App\Models\Flujo1;
@@ -487,6 +488,16 @@ class MatrimonioController extends Controller
                 'message' => $e->errors(),
             ], 422);
         } catch (\Exception $e) {
+            return response()->json($e->getMessage());
+        }
+    }
+
+    public function getRecibos(Request $request){
+        $limit = $request->input('limit', 10);
+        try{
+            $matrimonios=Matrimonio::with('forma_pago.cuotas')->paginate($limit);
+            return response()->json(reciboResource::collection($matrimonios->items()));
+        }catch(\Exception $e){
             return response()->json($e->getMessage());
         }
     }

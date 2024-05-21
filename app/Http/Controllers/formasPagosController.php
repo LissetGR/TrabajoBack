@@ -15,7 +15,6 @@ class formasPagosController extends Controller
     public function getFormaPago(Request $request)
     {
         try {
-
             $validator = $request->validate([
                 '*' => ['sometimes', new CamposPermitidos(['id'])],
                 'id' => 'required|numeric'

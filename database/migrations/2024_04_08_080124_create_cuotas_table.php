@@ -16,7 +16,6 @@ return new class extends Migration
             $table->unsignedBigInteger('id_formaPago');
             $table->integer('cantidad');
             $table->date('fecha');
-
             $table->foreign('id_formaPago')->references('id')->on('forma_pagos')->onDelete('cascade');
             $table->timestamps();
         });
