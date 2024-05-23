@@ -25,7 +25,7 @@ class AuthController extends Controller
     {
         try {
             $validator = $request->validate([
-                'name' => 'required|string|min:8|max:100|alpha_dash|unique:users',
+                'name' => 'required|string|min:8|max:100|unique:users',
                 'password' => 'required|string|min:8|confirmed|regex:/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).+$/',
                 'role' => ['required', Rule::in(['Admin', 'Trabajador', 'Cliente'])],
             ]);

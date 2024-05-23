@@ -20,7 +20,7 @@ class ClienteItalianoController extends Controller
     public function getClienteItaliano()
     {
         try {
-            $clientes = ClienteItaliano::all();
+            $clientes = ClienteItaliano::with('matrimonio')->get();
             return response()->json(ClienteItalianoResource::collection($clientes));
         } catch (\Exception $e) {
             return response()->json($e->getMessage());

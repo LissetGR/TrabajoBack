@@ -19,6 +19,6 @@ class ClienteItaliano extends Cliente
     }
 
     public function matrimonio(){
-        return $this->hasOne(Matrimonio::class, 'username_italiano', 'username');
+        return $this->hasOne(Matrimonio::class, 'username_italiano', 'id');
     }
 }

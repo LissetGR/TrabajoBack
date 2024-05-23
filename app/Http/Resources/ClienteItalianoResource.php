@@ -23,6 +23,7 @@ class ClienteItalianoResource extends JsonResource
             'telefono'=>$this->cliente->telefono,
             'email'=>$this->cliente->email,
             'email_registro'=>$this->email_registro,
+            'matrimonio'=>$this->matrimonio,
             'created_at'=>$this->created_at,
             'updated_at'=>$this->updated_at,
 

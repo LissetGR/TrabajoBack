@@ -14,10 +14,10 @@ class Matrimonio extends Model
     protected $fillable=['numero', 'username_cubano','username_italiano','tipo','via_llegada','fecha_llegada', 'costo'];
 
     public function usuario_italiano(){
-        return $this->belongsTo(Cliente::class, 'username_italiano');
+        return $this->belongsTo(Cliente::class ,'id','username_italiano');
     }
     public function usuario_cubano(){
-        return $this->belongsTo(Cliente::class, 'username_cubano');
+        return $this->belongsTo(Cliente::class ,'id', 'username_cubano');
     }
 
     public function forma_pago(){

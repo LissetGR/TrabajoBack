@@ -19,7 +19,7 @@ class ClienteController extends Controller
     public function getCliente()
     {
         try{
-            $clientes=Cliente::doesntHave('cliente_italiano')->get();
+            $clientes=Cliente::doesntHave('cliente_italiano')->with('matrimonio')->get();
             return response()->json($clientes);
 
         }catch(\Exception $e){
@@ -33,10 +33,10 @@ class ClienteController extends Controller
         $limit = $request->input('limit', 10);
 
         try{
-            $clientes= cliente::with('cliente_italiano')->paginate($limit);
+            $clientes= cliente::with(['cliente_italiano.matrimonio','matrimonio'])->paginate($limit);
 
             return response()->json($clientes->items());
-        }catch(\Exception $e){
+        }catch(\Exception $e){ 
             return response()->json($e->getMessage());
         }
 
@@ -164,12 +164,18 @@ class ClienteController extends Controller
 
     public function destroy(Request $request)
     {
+
         try {
-            $validator= $request->validate([
-                '*' => ['sometimes', new CamposPermitidos(['id'])],
-               'id'=>'required|numeric'
-            ]);
-            $cliente = cliente::findOrFail($validator['id']);
+
+            $validator = Validator::make(
+                ['id' => $request->header('id')],
+                [
+                    '*' => ['sometimes', new CamposPermitidos(['id'])],
+                    'id' => 'required|numeric',
+                ]
+            );
+
+            $cliente = cliente::findOrFail($validator->getData()['id']);
             $cliente->delete();
             return response()->json($cliente);
         }catch (ModelNotFoundException $e) {

@@ -21,7 +21,7 @@ class Cliente extends Model
     ];
 
     public function matrimonio(){
-        return $this->hasOne(Matrimonio::class, 'username_cubano', 'username');
+        return $this->hasOne(Matrimonio::class, 'username_cubano', 'id');
     }
 
     public function cliente_italiano(){
