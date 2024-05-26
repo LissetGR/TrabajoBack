@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
-use App\Models\cliente;
+use App\Models\Cliente;
 use App\Models\ClienteItaliano;
 use Illuminate\Validation\ValidationException;
 use App\Rules\CamposPermitidos;
@@ -36,7 +36,7 @@ class ClienteController extends Controller
             $clientes= cliente::with(['cliente_italiano.matrimonio','matrimonio'])->paginate($limit);
 
             return response()->json($clientes->items());
-        }catch(\Exception $e){ 
+        }catch(\Exception $e){
             return response()->json($e->getMessage());
         }
 
