@@ -7,8 +7,8 @@ use App\Models\Matrimonio;
 use App\Models\llegada_Doc11;
 use App\Models\formalizar_Matrim12;
 use App\Models\retirar_Doc13;
-use App\Models\Traduccion14;
-use App\Models\Flujo1;
+use App\Models\traduccion14;
+
 
 /**
  * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\Flujo1>
@@ -35,7 +35,7 @@ class Flujo1Factory extends Factory
             'cm_minrex' => $this->faker->date(),
             'id_retiroDocsMinrex' => retirar_Doc13::factory(),
             'cuarto_Email' => $this->faker->date(),
-            'id_traduccion' => Traduccion14::factory(),
+            'id_traduccion' => traduccion14::factory(),
             'observaciones' => $this->faker->sentence(),
         ];
     }
