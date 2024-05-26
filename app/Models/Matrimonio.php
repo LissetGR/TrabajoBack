@@ -25,15 +25,15 @@ class Matrimonio extends Model
     }
 
     public function flujo1(){
-        return $this->hasOne(flujo1::class,'id_matrimonio', 'numero');
+        return $this->hasOne(Flujo1::class,'id_matrimonio', 'numero');
     }
 
     public function flujo2(){
-        return $this->hasOne(flujo2::class,'id_matrimonio','numero');
+        return $this->hasOne(Flujo2::class,'id_matrimonio','numero');
     }
 
     public function flujo3(){
-        return $this->hasOne(flujo3::class,'id_matrimonio','numero');
+        return $this->hasOne(Flujo3::class,'id_matrimonio','numero');
     }
 
     public function observaciones(){
