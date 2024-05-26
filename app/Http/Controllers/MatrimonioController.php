@@ -42,7 +42,7 @@ class MatrimonioController extends Controller
                 'numero' => 'numeric|required'
             ]);
 
-            $matrimonio = matrimonio::with('usuario_italiano.cliente_italiano')->findOrFail($validator['numero']);
+            $matrimonio = matrimonio::with(['usuario_italiano.cliente_italiano'])->findOrFail($validator['numero']);
             return response()->json(new MatrimonioResource($matrimonio));
         } catch (ModelNotFoundException $e) {
             return response()->json([

@@ -33,7 +33,7 @@ class ClienteController extends Controller
         $limit = $request->input('limit', 10);
 
         try{
-            $clientes= cliente::with(['cliente_italiano.matrimonio','matrimonio'])->paginate($limit);
+            $clientes= Cliente::with(['cliente_italiano.matrimonio','matrimonio'])->paginate($limit);
 
             return response()->json($clientes->items());
         }catch(\Exception $e){
@@ -51,7 +51,7 @@ class ClienteController extends Controller
                 'id'=>'required|numeric'
             ]);
 
-            $cliente = cliente::with('matrimonio')->findOrFail($validator['id']);
+            $cliente = Cliente::with(['matrimonio','cliente_italiano'])->findOrFail($validator['id']);
             return response()->json($cliente);
         }
         catch (ModelNotFoundException $e) {
