@@ -50,6 +50,7 @@ Route::middleware('auth:sanctum')->group( function () {
     // Clientes
     Route::post('createClient',[ClienteController::class, 'create']);
     Route::get('getClient',[ClienteController::class, 'getCliente']);
+    Route::get('getClientes',[ClienteController::class, 'getClientes']);
     Route::get('getBusquedaClientes',[ClienteController::class, 'busquedaClientes']);
     Route::get('getClientByID',[ClienteController::class, 'getClienteById']);
     Route::delete('deleteClient',[ClienteController::class, 'destroy']);

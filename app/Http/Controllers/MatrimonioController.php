@@ -286,7 +286,7 @@ class MatrimonioController extends Controller
     {
         try {
             $validator = Validator::make(
-                ['id' => $request->header('id')],
+                ['numero' => $request->header('numero')],
                 [
                     '*' => ['sometimes', new CamposPermitidos(['numero'])],
                     'numero' => 'required|numeric',

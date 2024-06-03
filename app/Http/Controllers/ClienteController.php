@@ -31,6 +31,21 @@ class ClienteController extends Controller
 
     }
 
+    public function getClientes(Request $request)
+    {
+        $limit = $request->input('limit', 10);
+
+        try{
+            $clientes=Cliente::paginate($limit);
+            return response()->json($clientes->items());
+
+        }catch(\Exception $e){
+            return response()->json($e->getMessage());
+        }
+
+    }
+
+
     public function getClienteById(Request $request)
     {
         try {
