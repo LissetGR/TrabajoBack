@@ -8,6 +8,7 @@ use App\Models\Flujo1;
 use App\Models\formalizar_Matrim12;
 use App\Models\llegada_Doc11;
 use App\Models\Matrimonio;
+use Illuminate\Support\Facades\Validator;
 use App\Models\retirar_Doc13;
 use App\Models\traduccion14;
 use Illuminate\Http\Request;
@@ -340,12 +341,16 @@ class flujo1Controller extends Controller
     public function destroy(Request $request)
     {
         try {
-            $validator = $request->validate([
-                '*' => ['sometimes', new CamposPermitidos(['id'])],
-                'numero' => 'required|numeric'
-            ]);
+            $validator = Validator::make(
+                ['numero' => $request->header('numero')],
+                [
+                    '*' => ['sometimes', new CamposPermitidos(['numero'])],
+                    'numero' => 'required|numeric',
+                ]
+            );
 
-            $flujo = Flujo1::with(['llegadaDocs', 'formalizarMatrimonio', 'retiroDocs', 'traduccion'])->where('id_matrimonio', $validator['numero'])->first();
+
+            $flujo = Flujo1::with(['llegadaDocs', 'formalizarMatrimonio', 'retiroDocs', 'traduccion'])->where('id_matrimonio',$validator->getData()['numero'])->first();
 
             $flujo->delete();
             $flujo->llegadaDocs()->delete();

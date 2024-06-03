@@ -9,6 +9,7 @@ use Illuminate\Http\Request;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Validation\ValidationException;
 use App\Rules\CamposPermitidos;
+use Illuminate\Support\Facades\Validator;
 
 class observacionesController extends Controller
 {
@@ -97,12 +98,15 @@ class observacionesController extends Controller
     public function destroy(Request $request)
     {
         try {
-            $validator = $request->validate([
-                '*' => ['sometimes', new CamposPermitidos(['id' ])],
-                'id' => 'required|numeric'
-            ]);
+            $validator = Validator::make(
+                ['numero' => $request->header('numero')],
+                [
+                    '*' => ['sometimes', new CamposPermitidos(['numero'])],
+                    'numero' => 'required|numeric',
+                ]
+            );
 
-            $observaciones = observaciones::findOrFail($validator['id']);
+            $observaciones = observaciones::findOrFail($validator->getData()['numero']);
             $observaciones->delete();
 
             return response()->json($observaciones);

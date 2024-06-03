@@ -12,6 +12,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Validation\ValidationException;
 use App\Rules\CamposPermitidos;
+use Illuminate\Support\Facades\Validator;
 class flujo3Controller extends Controller
 {
     public function getFlujo3(Request $request)
@@ -181,12 +182,16 @@ class flujo3Controller extends Controller
     public function destroy(Request $request)
     {
         try {
-            $validator = $request->validate([
-                '*' => ['sometimes', new CamposPermitidos(['id'])],
-                'numero' => 'required|numeric'
-            ]);
+            $validator = Validator::make(
+                ['numero' => $request->header('numero')],
+                [
+                    '*' => ['sometimes', new CamposPermitidos(['numero'])],
+                    'numero' => 'required|numeric',
+                ]
+            );
 
-            $flujo = Flujo3::with('preparacionDocumentos')->where('id_matrimonio', $validator['numero'])->first();
+
+            $flujo = Flujo3::with('preparacionDocumentos')->where('id_matrimonio', $validator->getData()['numero'])->first();
             $flujo->delete();
             $flujo->preparacionDocumentos()->delete();
 

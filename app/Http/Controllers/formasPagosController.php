@@ -9,6 +9,8 @@ use Illuminate\Http\Request;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Validation\ValidationException;
 use App\Rules\CamposPermitidos;
+use Illuminate\Support\Facades\Validator;
+
 
 class formasPagosController extends Controller
 {
@@ -16,11 +18,11 @@ class formasPagosController extends Controller
     {
         try {
             $validator = $request->validate([
-                '*' => ['sometimes', new CamposPermitidos(['id'])],
-                'id' => 'required|numeric'
+                '*' => ['sometimes', new CamposPermitidos(['numero'])],
+                'numero' => 'required|numeric'
             ]);
 
-            $forma = formaPago::with('cuotas')->where('id_matrimonio', $validator['id'])->get();
+            $forma = formaPago::with('cuotas')->where('id_matrimonio', $validator['numero'])->get();
             return response()->json($forma);
         } catch (ModelNotFoundException $e) {
             return response()->json([
@@ -114,12 +116,15 @@ class formasPagosController extends Controller
     {
         try {
 
-            $validator = $request->validate([
-                '*' => ['sometimes', new CamposPermitidos(['id'])],
-                'id' => 'required|numeric'
-            ]);
+            $validator = Validator::make(
+                ['numero' => $request->header('numero')],
+                [
+                    '*' => ['sometimes', new CamposPermitidos(['numero'])],
+                    'numero' => 'required|numeric',
+                ]
+            );
 
-            $forma = formaPago::findOrFail($validator['id']);
+            $forma = formaPago::findOrFail($validator->getData()['numero']);
             $forma->delete();
             $forma->cuotas()->delete();
 

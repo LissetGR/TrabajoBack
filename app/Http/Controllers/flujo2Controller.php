@@ -8,6 +8,7 @@ use App\Models\Flujo2;
 use App\Models\Matrimonio;
 use App\Models\preparar_Doc21;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\ValidationException;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
@@ -184,12 +185,15 @@ class flujo2Controller extends Controller
     public function destroy(Request $request)
     {
         try {
-            $validator = $request->validate([
-                '*' => ['sometimes', new CamposPermitidos(['id'])],
-                'numero' => 'required|numeric'
-            ]);
+            $validator = Validator::make(
+                ['numero' => $request->header('numero')],
+                [
+                    '*' => ['sometimes', new CamposPermitidos(['numero'])],
+                    'numero' => 'required|numeric',
+                ]
+            );
 
-            $flujo = Flujo2::with('preparacionDocumentos')->where('id_matrimonio', $validator['numero'])->first();
+            $flujo = Flujo2::with('preparacionDocumentos')->where('id_matrimonio',$validator->getData()['numero'])->first();
             $flujo->delete();
             $flujo->preparacionDocumentos()->delete();
 
