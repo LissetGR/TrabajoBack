@@ -39,7 +39,6 @@ use App\Models\traduccion14;
 Route::prefix('auth')->group(function () {
     Route::post('login',[AuthController::class, 'login'])->name('login');
     Route::post('register',[AuthController::class, 'register']);
-    Route::get('getUser',[AuthController::class, 'getUser']);
 });
 
 Route::middleware('auth:sanctum')->group( function () {
@@ -56,7 +55,6 @@ Route::middleware('auth:sanctum')->group( function () {
     Route::delete('deleteClient',[ClienteController::class, 'destroy']);
     Route::patch('modificarClient',[ClienteController::class, 'modificar']);
     Route::get('getClient',[ClienteController::class, 'getCliente']);
-    Route::get('getAllClient',[ClienteController::class, 'getAllCliente']);
 
     // Matrimonio
     Route::post('createMatrimonio',[MatrimonioController::class, 'create']);
