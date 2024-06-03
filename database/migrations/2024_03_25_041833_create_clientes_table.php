@@ -19,12 +19,11 @@ return new class extends Migration
             $table->string('direccion');
             $table->string('telefono');
             $table->string('email');
+            $table->string('email_registro')->nullable();
+            $table->boolean('es_cubano');
 
             $table->foreign('username')->references('name')->on('users')->onDelete('cascade')->onUpdate('cascade');
             $table->timestamps();
-
-            // $table->timestamp('created_at')->useCurrent();
-            // $table->timestamp('updated_at')->useCurrent();
 
         });
     }

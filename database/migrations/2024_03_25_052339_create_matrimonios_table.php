@@ -22,7 +22,7 @@ return new class extends Migration
             $table->date('fecha_llegada');
 
             $table->foreign('username_cubano')->references('id')->on('clientes')->onDelete('cascade')->onUpdate('cascade');
-            $table->foreign('username_italiano')->references('id')->on('cliente_italianos')->onDelete('cascade')->onUpdate('cascade');
+            $table->foreign('username_italiano')->references('id')->on('clientes')->onDelete('cascade')->onUpdate('cascade');
             $table->timestamps();
         });
     }

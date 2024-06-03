@@ -6,7 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Resources\MatrimonioResource;
 use App\Http\Resources\reciboResource;
 use App\Models\Cliente;
-use App\Models\ClienteItaliano;
+use Illuminate\Support\Facades\Validator;
 use App\Models\Flujo1;
 use App\Models\Flujo2;
 use App\Models\Flujo3;
@@ -27,7 +27,7 @@ class MatrimonioController extends Controller
         $limit = $request->input('limit', 10);
         try{
 
-            $matrimonios=Matrimonio::with('usuario_italiano.cliente_italiano')->paginate($limit);
+            $matrimonios=Matrimonio::paginate($limit);
             return response()->json(MatrimonioResource::collection($matrimonios->items()));
         }catch(\Exception $e){
             return response()->json($e->getMessage());
@@ -42,7 +42,7 @@ class MatrimonioController extends Controller
                 'numero' => 'numeric|required'
             ]);
 
-            $matrimonio = matrimonio::with(['usuario_italiano.cliente_italiano'])->findOrFail($validator['numero']);
+            $matrimonio = matrimonio::findOrFail($validator['numero']);
             return response()->json(new MatrimonioResource($matrimonio));
         } catch (ModelNotFoundException $e) {
             return response()->json([
@@ -69,6 +69,7 @@ class MatrimonioController extends Controller
                 '*' => ['sometimes', new CamposPermitidos(['nombre','pasaporte','numero','tipo','anno','mes','dia'])],
                 'nombre' => 'string',
                 'numero' => 'numeric',
+                'pasaporte' => 'string|min:7|max:12|regex:/^[a-zA-Z].*$/',
                 'tipo' => [
                      'string',
                     function ($attribute, $value, $fail) {
@@ -119,7 +120,6 @@ class MatrimonioController extends Controller
                 ->when($request->has('anno'), function ($query) use ($validator) {
                     return $query->whereYear('fecha_llegada', $validator['anno']);
                 })
-                ->with('usuario_italiano.cliente_italiano')
                 ->get();
 
             if ($matrimonios->isNotEmpty()) {
@@ -172,13 +172,16 @@ class MatrimonioController extends Controller
             ]);
 
 
-            $username_italiano = Cliente::has('cliente_italiano')
+            $username_italiano = Cliente::
+                where('es_cubano', false)
                 ->where('clientes.username', $validator['username_italiano'])
                 ->firstOr(function () {
                    throw new \Exception('No se pudo encontrar el cliente italiano con el username proporcionado');
                 });
 
-            $username_cubano = Cliente::whereRaw('LOWER(username) = ?', [strtolower($validator['username_cubano'])])
+            $username_cubano = Cliente::
+            where('es_cubano', true)
+            ->whereRaw('LOWER(username) = :username', ['username' => strtolower($validator['username_cubano'])])
             ->firstOr(function () {
                 throw new \Exception('No se pudo encontrar el cliente cubano con el username proporcionado');
             });
@@ -238,13 +241,16 @@ class MatrimonioController extends Controller
                 'fecha_llegada' => 'required|date_format:d/m/Y'
             ]);
 
-            $username_italiano =  Cliente::join('cliente_italianos', 'clientes.id', '=', 'cliente_italianos.id')
+            $username_italiano =  Cliente::
+                 where('es_cubano', false)
                 ->where('clientes.username', $validator['username_italiano'])
                 ->firstOr(function () {
                     throw new \Exception('Cliente italiano no encontrado');
                 });
 
-            $username_cubano = Cliente::whereRaw('LOWER(username) = ?', [strtolower($validator['username_cubano'])])
+            $username_cubano = Cliente::
+            where('es_cubano',true)
+            ->whereRaw('LOWER(username) = ?', [strtolower($validator['username_cubano'])])
             ->firstOr(function () {
                 throw new \Exception('Cliente cubano no encontrado');
             });
@@ -279,12 +285,15 @@ class MatrimonioController extends Controller
     public function destroy(Request $request)
     {
         try {
-            $validator = $request->validate([
-                '*' => ['sometimes', new CamposPermitidos(['numero'])],
-                'numero' => 'numeric|required'
-            ]);
+            $validator = Validator::make(
+                ['id' => $request->header('id')],
+                [
+                    '*' => ['sometimes', new CamposPermitidos(['numero'])],
+                    'numero' => 'required|numeric',
+                ]
+            );
 
-            $matrimonio = Matrimonio::findOrFail($validator['numero']);
+            $matrimonio = Matrimonio::findOrFail($validator->getData()['numero']);
             $matrimonio->delete();
             return response()->json(new MatrimonioResource($matrimonio));
         } catch (ModelNotFoundException $e) {
@@ -311,7 +320,7 @@ class MatrimonioController extends Controller
             $validator = $request->validate([
                 '*' => ['sometimes', new CamposPermitidos(['numero', 'pasaporte', 'nombre','mes','anno','dia'])],
                 'nombre' => 'string',
-                'pasaporte' => 'string',
+                'pasaporte' => 'string|min:7|max:12|regex:/^[a-zA-Z].*$/',
                 'numero' => 'numeric',
                 'anno' => 'integer|between:' . $hundred_years_ago . ',' . $current_year,
                 'mes' => 'integer|between:1,12',
@@ -354,7 +363,6 @@ class MatrimonioController extends Controller
                 ->when($request->has('anno'), function ($query) use ($validator) {
                     return $query->whereYear('fecha_llegada', $validator['anno']);
                 })
-                ->with('usuario_italiano.cliente_italiano')
                 ->get();
 
             if ($matrimonios->isNotEmpty()) {
@@ -386,6 +394,7 @@ class MatrimonioController extends Controller
                 '*' => ['sometimes', new CamposPermitidos(['numero', 'pasaporte', 'nombre','mes','anno','dia'])],
                 'nombre' => 'string',
                 'numero' => 'numeric',
+                'pasaporte' => 'string|min:7|max:12|regex:/^[a-zA-Z].*$/',
                 'anno' => 'integer|between:' . $hundred_years_ago . ',' . $current_year,
                 'mes' => 'integer|between:1,12',
                 'dia' => 'integer|between:1,31',
@@ -427,7 +436,6 @@ class MatrimonioController extends Controller
                 ->when($request->has('anno'), function ($query) use ($validator) {
                     return $query->whereYear('fecha_llegada', $validator['anno']);
                 })
-                ->with('usuario_italiano.cliente_italiano')
                 ->get();
 
             if ($matrimonios->isNotEmpty()) {

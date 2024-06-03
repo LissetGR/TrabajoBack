@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Controllers\Controller;
+use App\Http\Resources\clienteIDMatrimonioResource;
 use App\Http\Resources\ClienteItalianoResource;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\Request;
@@ -16,32 +17,19 @@ use App\Models\User;
 
 class ClienteController extends Controller
 {
-    public function getCliente()
-    {
-        try{
-            $clientes=Cliente::doesntHave('cliente_italiano')->with('matrimonio')->get();
-            return response()->json($clientes);
-
-        }catch(\Exception $e){
-            return response()->json($e->getMessage());
-        }
-
-    }
-
-    public function getAllCliente(Request $request)
+    public function getCliente(Request $request)
     {
         $limit = $request->input('limit', 10);
 
         try{
-            $clientes= Cliente::with(['cliente_italiano.matrimonio','matrimonio'])->paginate($limit);
+            $clientes=Cliente::with(['matrimonio','matrimonioItaliano'])->paginate($limit);
+            return response()->json(clienteItalianoResource::collection($clientes->items()));
 
-            return response()->json($clientes->items());
         }catch(\Exception $e){
             return response()->json($e->getMessage());
         }
 
     }
-
 
     public function getClienteById(Request $request)
     {
@@ -51,8 +39,8 @@ class ClienteController extends Controller
                 'id'=>'required|numeric'
             ]);
 
-            $cliente = Cliente::with(['matrimonio','cliente_italiano'])->findOrFail($validator['id']);
-            return response()->json($cliente);
+            $cliente = Cliente::with(['matrimonio','matrimonioItaliano'])->findOrFail($validator['id']);
+            return response()->json(clienteItalianoResource::collection($cliente));
         }
         catch (ModelNotFoundException $e) {
             return response()->json([
@@ -75,10 +63,11 @@ class ClienteController extends Controller
         try{
             $validator=$request->validate([
                 '*' => ['sometimes', new CamposPermitidos(['nombre','pasaporte', 'username', 'id'])],
-                'pasaporte' => 'sometimes|string|alpha_dash',
+                'pasaporte' => 'sometimes|string|min:7|max:12|regex:/^[a-zA-Z].*$/',
                 'username' => 'sometimes|string|alpha_dash',
                 'nombre' => 'sometimes|string',
                 'id'=>'sometimes|numeric'
+
             ]);
 
             $clientes=cliente::query()
@@ -94,7 +83,6 @@ class ClienteController extends Controller
             ->when($request->has('id'), function ($query) use ($validator) {
                 return $query->where('id', $validator['id']);
             })
-            ->with('cliente_italiano')
             ->get();
 
             if($clientes->isNotEmpty()){
@@ -122,13 +110,16 @@ class ClienteController extends Controller
         try {
 
             $validator = $request->validate([
-                '*' => ['sometimes', new CamposPermitidos(['nombre_apellidos','pasaporte', 'username', 'direccion','telefono','email'])],
+                '*' => ['sometimes', new CamposPermitidos(['nombre_apellidos','pasaporte', 'username', 'direccion','telefono','email','email_registro'])],
                 'username' => 'required|string|min:8|max:100|alpha_dash|unique:clientes',
-                'pasaporte' => 'required|string|min:7|max:7|alpha_dash|unique:clientes',
+                'pasaporte' => 'required|string|min:7|max:12|regex:/^[a-zA-Z].*$/|unique:clientes',
                 'nombre_apellidos' => 'required|string|min:10',
                 'direccion' => 'required|string|min:10',
                 'telefono' => 'required|numeric|min:8',
-                'email' => 'required|email'
+                'email' => 'required|email',
+                'email_registro' => 'email',
+                'es_cubano' => 'required|boolean',
+
             ]);
 
             $userExists = User::where('name', $request->input('username'))->exists();
@@ -145,7 +136,9 @@ class ClienteController extends Controller
                 'pasaporte'=>$validator['pasaporte'],
                 'direccion' => $validator['direccion'],
                 'telefono' => $validator['telefono'],
-                'email' => $validator['email']
+                'email' => $validator['email'],
+                'es_cubano' => $validator['es_cubano'],
+                'email_registro' => optional($validator)['email_registro'],
             ]);
 
             $cliente->save();
@@ -201,12 +194,14 @@ class ClienteController extends Controller
             $validator = $request->validate([
                 '*' => ['sometimes', new CamposPermitidos(['id','pasaporte','nombre_apellidos', 'username', 'direccion','telefono','email'])],
                 'id'=>'required|numeric',
-                'pasaporte' => 'required|string|min:7|max:7|alpha_dash',
+                'pasaporte' => 'required|string|min:7|max:12|regex:/^[a-zA-Z].*$/|alpha_dash',
                 'username' => 'required|string|min:8|max:100|alpha_dash',
                 'nombre_apellidos' => 'required|string|min:10',
                 'direccion' => 'required|string|min:10',
                 'telefono' => 'required|numeric|min:8',
-                'email' => 'required|email'
+                'email' => 'required|email',
+                'email_registro' => 'email',
+                'es_cubano' => 'required|boolean',
             ]);
 
             $cliente = cliente::findOrFail($request->input('id'));

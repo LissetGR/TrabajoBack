@@ -3,7 +3,7 @@
 namespace Database\Factories;
 
 use Illuminate\Database\Eloquent\Factories\Factory;
-use App\Models\ClienteItaliano;
+use App\Models\clienteItaliano;
 use App\Models\Cliente;
 use App\Models\FormaPago;
 use App\Models\Flujo1;
@@ -25,7 +25,7 @@ class MatrimonioFactory extends Factory
     {
         return [
             'numero' => $this->faker->unique()->randomNumber(4),
-            'username_italiano' => ClienteItaliano::factory(),
+            'username_italiano' => Cliente::factory(),
             'username_cubano' => Cliente::factory(),
             'tipo' => $this->faker->randomElement(['Per procura', 'Congiunto']),
             'via_llegada' => $this->faker->randomElement(['Mail', 'Chiamata', 'Whatsapp', 'In busta']),

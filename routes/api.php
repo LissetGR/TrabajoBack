@@ -58,13 +58,6 @@ Route::middleware('auth:sanctum')->group( function () {
     Route::get('getClient',[ClienteController::class, 'getCliente']);
     Route::get('getAllClient',[ClienteController::class, 'getAllCliente']);
 
-    // Clientes italianos
-    Route::post('createClientItalian',[ClienteItalianoController::class, 'create']);
-    Route::patch('modificarClientItalian',[ClienteItalianoController::class, 'modificar']);
-    Route::get('getClientItalian',[ClienteItalianoController::class, 'getClienteItaliano']);
-    Route::get('getClientItalianById',[ClienteItalianoController::class, 'getClienteItalianoById']);
-    // Route::delete('deleteClientItalian',[ClienteItalianoController::class, 'destroy']);
-
     // Matrimonio
     Route::post('createMatrimonio',[MatrimonioController::class, 'create']);
     Route::get('getMatrimonio',[MatrimonioController::class, 'getMatrimonio']);

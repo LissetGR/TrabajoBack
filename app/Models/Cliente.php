@@ -17,15 +17,16 @@ class Cliente extends Model
         'nombre_apellidos',
         'direccion',
         'telefono',
-        'email'
+        'email',
+        'email_registro',
+        'es_cubano'
     ];
 
-    public function matrimonio(){
+    public function matrimonio() {
         return $this->hasOne(Matrimonio::class, 'username_cubano', 'id');
     }
-
-    public function cliente_italiano(){
-        return $this->hasOne(ClienteItaliano::class ,'id', 'id');
+    public function matrimonioItaliano() {
+        return $this->hasOne(Matrimonio::class, 'username_italiano', 'id');
     }
 
     public function user(){
