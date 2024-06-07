@@ -147,8 +147,8 @@ class MatrimonioController extends Controller
             $validator = $request->validate([
                 '*' => ['sometimes', new CamposPermitidos(['username_cubano','username_italiano','numero','tipo','via_llegada','costo','fecha_llegada'])],
                 'numero' => 'required|numeric|unique:matrimonios',
-                'username_italiano' => 'required|string',
-                'username_cubano' => 'required|string',
+                'pasaporte_italiano' => 'required|string',
+                'pasaporte_cubano' => 'required|string',
                 'tipo' => [
                     'required', 'string',
                     function ($attribute, $value, $fail) {
@@ -174,14 +174,14 @@ class MatrimonioController extends Controller
 
             $username_italiano = Cliente::
                 where('es_cubano', false)
-                ->where('clientes.username', $validator['username_italiano'])
+                ->whereRaw('LOWER(pasaporte) =?', [strtolower($validator['pasaporte_italiano'])])
                 ->firstOr(function () {
                    throw new \Exception('No se pudo encontrar el cliente italiano con el username proporcionado');
                 });
 
             $username_cubano = Cliente::
             where('es_cubano', true)
-            ->whereRaw('LOWER(username) = :username', ['username' => strtolower($validator['username_cubano'])])
+            ->whereRaw('LOWER(pasaporte) =?', [strtolower($validator['pasaporte_cubano'])])
             ->firstOr(function () {
                 throw new \Exception('No se pudo encontrar el cliente cubano con el username proporcionado');
             });
@@ -217,8 +217,8 @@ class MatrimonioController extends Controller
             $validator = $request->validate([
                 '*' => ['sometimes', new CamposPermitidos(['username_cubano','username_italiano','numero','tipo','via_llegada','costo','fecha_llegada'])],
                 'numero' => 'required|numeric',
-                'username_italiano' => 'required|string',
-                'username_cubano' => 'required|string',
+                'pasaporte_italiano' => 'required|string',
+                'pasaporte_cubano' => 'required|string',
                 'tipo' => [
                     'required', 'string',
                     function ($attribute, $value, $fail) {
@@ -241,18 +241,18 @@ class MatrimonioController extends Controller
                 'fecha_llegada' => 'required|date_format:d/m/Y'
             ]);
 
-            $username_italiano =  Cliente::
-                 where('es_cubano', false)
-                ->where('clientes.username', $validator['username_italiano'])
-                ->firstOr(function () {
-                    throw new \Exception('Cliente italiano no encontrado');
-                });
+            $username_italiano = Cliente::
+            where('es_cubano', false)
+            ->whereRaw('LOWER(pasaporte) =?', [strtolower($validator['pasaporte_italiano'])])
+            ->firstOr(function () {
+               throw new \Exception('No se pudo encontrar el cliente italiano con el username proporcionado');
+            });
 
             $username_cubano = Cliente::
-            where('es_cubano',true)
-            ->whereRaw('LOWER(username) = ?', [strtolower($validator['username_cubano'])])
+            where('es_cubano', true)
+            ->whereRaw('LOWER(pasaporte) =?', [strtolower($validator['pasaporte_cubano'])])
             ->firstOr(function () {
-                throw new \Exception('Cliente cubano no encontrado');
+                throw new \Exception('No se pudo encontrar el cliente cubano con el username proporcionado');
             });
 
 
