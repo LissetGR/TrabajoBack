@@ -145,7 +145,7 @@ class MatrimonioController extends Controller
     {
         try {
             $validator = $request->validate([
-                '*' => ['sometimes', new CamposPermitidos(['username_cubano','username_italiano','numero','tipo','via_llegada','costo','fecha_llegada'])],
+                '*' => ['sometimes', new CamposPermitidos(['pasaporte_cubano','pasaporte_italiano','numero','tipo','via_llegada','costo','fecha_llegada'])],
                 'numero' => 'required|numeric|unique:matrimonios',
                 'pasaporte_italiano' => 'required|string',
                 'pasaporte_cubano' => 'required|string',
@@ -215,7 +215,7 @@ class MatrimonioController extends Controller
     {
         try {
             $validator = $request->validate([
-                '*' => ['sometimes', new CamposPermitidos(['username_cubano','username_italiano','numero','tipo','via_llegada','costo','fecha_llegada'])],
+                '*' => ['sometimes', new CamposPermitidos(['pasaporte_cubano','pasaporte_italiano','numero','tipo','via_llegada','costo','fecha_llegada'])],
                 'numero' => 'required|numeric',
                 'pasaporte_italiano' => 'required|string',
                 'pasaporte_cubano' => 'required|string',

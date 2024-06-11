@@ -68,7 +68,7 @@ class AuthController extends Controller
 
 
             $user = User::where('name', $request->name)->first();
-
+             
             if (Auth::attempt($validator, true)) {
                 return response()->json([
                     'token' => $user->createToken('userToke')->plainTextToken,

@@ -55,7 +55,7 @@ class ClienteController extends Controller
             ]);
 
             $cliente = Cliente::with(['matrimonio','matrimonioItaliano'])->findOrFail($validator['id']);
-            return response()->json(clienteItalianoResource::collection($cliente));
+            return response()->json($cliente);
         }
         catch (ModelNotFoundException $e) {
             return response()->json([
@@ -126,7 +126,7 @@ class ClienteController extends Controller
 
             $validator = $request->validate([
                 '*' => ['sometimes', new CamposPermitidos(['nombre_apellidos','pasaporte', 'username', 'direccion','telefono','email','email_registro'])],
-                'username' => 'required|string|min:8|max:100|alpha_dash|unique:clientes',
+                'username' => 'required|string|min:8|max:100|unique:clientes',
                 'pasaporte' => 'required|string|min:7|max:12|regex:/^[a-zA-Z].*$/|unique:clientes',
                 'nombre_apellidos' => 'required|string|min:10',
                 'direccion' => 'required|string|min:10',
