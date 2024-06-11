@@ -210,7 +210,7 @@ class ClienteController extends Controller
                 '*' => ['sometimes', new CamposPermitidos(['id','pasaporte','nombre_apellidos', 'username', 'direccion','telefono','email'])],
                 'id'=>'required|numeric',
                 'pasaporte' => 'required|string|min:7|max:12|regex:/^[a-zA-Z].*$/|alpha_dash',
-                'username' => 'required|string|min:8|max:100|alpha_dash',
+                'username' => 'required|string|min:8|max:100',
                 'nombre_apellidos' => 'required|string|min:10',
                 'direccion' => 'required|string|min:10',
                 'telefono' => 'required|numeric|min:8',
