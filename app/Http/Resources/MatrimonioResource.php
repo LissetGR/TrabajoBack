@@ -24,9 +24,6 @@ class MatrimonioResource extends JsonResource
             'via_llegada'=>$this->via_llegada,
             'forma_pago'=>$this->forma_pago,
             'observaciones'=>$this->observaciones,
-            'flujo1'=>new Flujo1Resource($this->flujo1),
-            'flujo2'=>new Flujo2Resource($this->flujo2),
-            'flujo3'=>new Flujo3Resource($this->flujo3),
         ];
     }
 }

@@ -18,7 +18,6 @@ class ClienteFactory extends Factory
     {
         return [
             'username' => User::factory()->create()->name,
-            'pasaporte' => $this->faker->randomNumber(8),
             'nombre_apellidos' => $this->faker->name,
             'direccion' => $this->faker->address,
             'telefono' => $this->faker->phoneNumber,
