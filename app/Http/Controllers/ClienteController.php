@@ -126,8 +126,8 @@ class ClienteController extends Controller
                 'nombre_apellidos' => 'required|string|min:10',
                 'direccion' => 'required|string|min:10',
                 'telefono' => 'required|numeric|min:8',
-                'email' => 'required|email',
-                'email_registro' => 'email',
+                'email' => 'required|email|unique:clientes',
+                'email_registro' => 'email|unique:clientes|',
                 'es_cubano' => 'required|boolean',
 
             ]);
